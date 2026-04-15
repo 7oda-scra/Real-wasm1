@@ -1,0 +1,107 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@using RealDesign2.Client.Theme
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<MudThemeProvider Theme="@AppTheme.Default" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <img src="assets/main-logo.png" alt="Smart Code Logo" style="max-height: 40px; margin-left: 10px;" />
+        <MudSpacer />
+
+        <AuthorizeView>
+            <Authorized>
+                @if (_currentUser is not null)
+                {
+                    <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                        <ActivatorContent Context="menuActivator">
+                            <MudAvatar Color="Color.Secondary" Style="cursor: pointer;">
+                                @GetAvatarInitial()
+                            </MudAvatar>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <MudMenuItem OnClick="LogoutAsync" Disabled="_isLoggingOut">
+                                @(_isLoggingOut ? "Signing out..." : "Sign Out")
+                            </MudMenuItem>
+                        </ChildContent>
+                    </MudMenu>
+                }
+            </Authorized>
+        </AuthorizeView>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Variant="@DrawerVariant.Mini" Elevation="1" ClipMode="DrawerClipMode.Always">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4 pt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">x</span>
+</div>
+
+@code {
+    private bool _drawerOpen = true;
+    private bool _isLoggingOut;
+    private UserDto? _currentUser;
+
+    protected override void OnInitialized()
+    {
+        _currentUser = AuthService.CurrentUser;
+        AuthService.OnAuthStateChanged += HandleAuthStateChanged;
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= HandleAuthStateChanged;
+    }
+
+    private void HandleAuthStateChanged(UserDto? user)
+    {
+        _currentUser = user;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private string GetAvatarInitial()
+    {
+        if (string.IsNullOrWhiteSpace(_currentUser?.FullName))
+        {
+            return "?";
+        }
+
+        return _currentUser.FullName[..1].ToUpperInvariant();
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task LogoutAsync()
+    {
+        _isLoggingOut = true;
+
+        try
+        {
+            await AuthService.LogoutAsync();
+            NavigationManager.NavigateTo("/login", forceLoad: false);
+        }
+        finally
+        {
+            _isLoggingOut = false;
+        }
+    }
+}

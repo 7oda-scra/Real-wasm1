@@ -1,0 +1,205 @@
+@page "/hr"
+@attribute [Authorize]
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-6">
+    <MudGrid Spacing="6">
+        <MudItem xs="12" md="3" Class="@(string.IsNullOrEmpty(_activeForm) ? "d-block" : "d-none d-md-block")">
+            <MudPaper Elevation="0" Class="pa-4 rounded-xl" Style="border: 1px solid #f0f0f0;">
+                <MudNavMenu Bordered="true" Color="Color.Primary" Class="mud-width-full">
+                    <MudNavGroup Title="Employee Data" Expanded="true" Icon="@Icons.Material.Filled.FolderShared">
+                        <MudNavLink OnClick="@(() => SetActiveForm("Sectors"))">Sectors</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Departments"))">Departments</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Sections"))">Sections</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Positions/Jobs"))">Positions / Jobs</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Qualifications"))">Qualifications</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Employees"))" Class="@GetActiveCss("Employees")">Employees</MudNavLink>
+                    </MudNavGroup>
+
+                    <MudNavGroup Title="Shifts" Expanded="true" Icon="@Icons.Material.Filled.Schedule">
+                        <MudNavLink OnClick="@(() => SetActiveForm("Time and Attendance system"))">Time and Attendance</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Shifts"))">Shifts</MudNavLink>
+                    </MudNavGroup>
+
+                    <MudNavGroup Title="Salary Settings" Expanded="true" Icon="@Icons.Material.Filled.Paid">
+                        <MudNavLink OnClick="@(() => SetActiveForm("Salary Items"))">Salary Items</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Overtime settings"))">Overtime Settings</MudNavLink>
+                        <MudNavLink OnClick="@(() => SetActiveForm("Salary calculation rules"))">Salary Calculation Rules</MudNavLink>
+                    </MudNavGroup>
+                </MudNavMenu>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="9" Class="@(string.IsNullOrEmpty(_activeForm) ? "d-none d-md-block" : "d-block")">
+            @if (string.IsNullOrEmpty(_activeForm))
+            {
+                <MudPaper Elevation="0" Class="d-flex flex-column align-center justify-center rounded-xl" Style="height: 60vh; border: 1px dashed #e5e7eb; background: transparent;">
+                    <MudIcon Icon="@Icons.Material.Filled.Category" Style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;" />
+                    <MudText Typo="Typo.h6" Style="color: #9ca3af;">Select a module to view settings.</MudText>
+                </MudPaper>
+            }
+            else if (_activeForm == "Employees")
+            {
+                <MudStack Spacing="4">
+                    <MudPaper Elevation="0" Class="pa-4 rounded-xl" Style="border: 1px solid #f0f0f0;">
+                        <div class="d-flex align-center justify-space-between mb-4">
+                            <MudText Typo="Typo.h5" Style="font-weight: 700; letter-spacing: -0.5px;">
+                                <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Class="d-md-none mr-2" OnClick="CloseForm" />
+                                @_activeForm
+                            </MudText>
+                            <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary">
+                                @_employees.Count Employees
+                            </MudChip>
+                        </div>
+
+                        <MudTable Items="_employees" Elevation="0" Hover="true" Dense="true" Class="employee-table" Breakpoint="Breakpoint.Sm">
+                            <HeaderContent>
+                                <MudTh>Name</MudTh>
+                                <MudTh>Title</MudTh>
+                                <MudTh>Department</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Name">@context.Name</MudTd>
+                                <MudTd DataLabel="Title">@context.Title</MudTd>
+                                <MudTd DataLabel="Department">@context.Department</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Class="pa-6 rounded-xl" Style="border: 1px solid #f0f0f0;">
+                        <FormActionToolbar
+                            OnAdd="HandleAdd"
+                            OnModify="HandleModify"
+                            OnDelete="HandleDelete"
+                            OnSave="HandleSave"
+                            OnClose="HandleToolbarClose" />
+
+                        <MudDivider Class="my-6" />
+
+                        <MudGrid Spacing="4">
+                            <MudItem xs="12" sm="6">
+                                <MudTextField @bind-Value="_employeeName" Label="Employee Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudTextField @bind-Value="_employeeId" Label="Employee ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudTextField @bind-Value="_employeeTitle" Label="Job Title" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudTextField @bind-Value="_employeeEmail" Label="Email Address" Variant="Variant.Outlined" InputType="InputType.Email" Margin="Margin.Dense" FullWidth="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudSelect @bind-Value="_employeeDepartment" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelectItem Value="@("Engineering")" />
+                                    <MudSelectItem Value="@("Support")" />
+                                    <MudSelectItem Value="@("Human Resources")" />
+                                    <MudSelectItem Value="@("Marketing")" />
+                                </MudSelect>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudStack>
+            }
+            else
+            {
+                <MudPaper Elevation="0" Class="pa-6 rounded-xl" Style="border: 1px solid #f0f0f0;">
+                    <div class="d-flex align-center justify-space-between mb-4">
+                        <MudText Typo="Typo.h5" Style="font-weight: 700; letter-spacing: -0.5px;">
+                            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Class="d-md-none mr-2" OnClick="CloseForm" />
+                            @_activeForm
+                        </MudText>
+                        <MudStack Row="true" Spacing="2">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="rounded-pill px-6" Style="text-transform: none; font-weight: 600;">Save</MudButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" OnClick="CloseForm" Class="d-none d-md-flex" />
+                        </MudStack>
+                    </div>
+
+                    <MudDivider Class="mb-6" />
+
+                    <div class="d-flex flex-column align-center justify-center pa-16">
+                        <MudIcon Icon="@Icons.Material.Filled.Build" Style="font-size: 3rem; color: #e5e7eb; margin-bottom: 1rem;" />
+                        <MudText Typo="Typo.body1" Style="color: #6b7280;">Form template for @_activeForm is not yet implemented.</MudText>
+                    </div>
+                </MudPaper>
+            }
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string _activeForm = "Employees";
+    private readonly List<EmployeeMock> _employees =
+    [
+        new EmployeeMock
+        {
+            Id = 1,
+            Name = "Mahmoud Diaa",
+            Title = "Frontend Programmer",
+            Email = "mahmoud.diaa@smartcode.local",
+            Department = "Engineering"
+        },
+        new EmployeeMock
+        {
+            Id = 2,
+            Name = "Ahmed Samak",
+            Title = "Tech Support",
+            Email = "ahmed.samak@smartcode.local",
+            Department = "Support"
+        }
+    ];
+
+    private string _employeeName = string.Empty;
+    private string _employeeId = string.Empty;
+    private string _employeeTitle = string.Empty;
+    private string _employeeEmail = string.Empty;
+    private string _employeeDepartment = string.Empty;
+
+    private string GetActiveCss(string formName)
+    {
+        return _activeForm == formName ? "mud-nav-link-active" : string.Empty;
+    }
+
+    private void SetActiveForm(string formName)
+    {
+        _activeForm = formName;
+    }
+
+    private void CloseForm()
+    {
+        _activeForm = string.Empty;
+    }
+
+    private void HandleAdd(MouseEventArgs _)
+    {
+    }
+
+    private void HandleModify(MouseEventArgs _)
+    {
+    }
+
+    private void HandleDelete(MouseEventArgs _)
+    {
+    }
+
+    private void HandleSave(MouseEventArgs _)
+    {
+    }
+
+    private void HandleToolbarClose(MouseEventArgs _)
+    {
+        CloseForm();
+    }
+
+    private sealed class EmployeeMock
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Title { get; set; } = string.Empty;
+
+        public string Email { get; set; } = string.Empty;
+
+        public string Department { get; set; } = string.Empty;
+    }
+}

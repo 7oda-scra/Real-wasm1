@@ -1,0 +1,30 @@
+@page "/error"
+
+<PageTitle>Error</PageTitle>
+
+<MudPaper Class="pa-8 mt-6 rounded-xl" Elevation="0" Style="border: 1px solid #fecaca; background: #fef2f2;">
+    <MudText Typo="Typo.h4" Style="font-weight: 700; color: #991b1b;">Error</MudText>
+    <MudText Typo="Typo.body1" Class="mt-3" Style="color: #7f1d1d;">
+        An unexpected error occurred while processing your request.
+    </MudText>
+
+    @if (!string.IsNullOrWhiteSpace(RequestId))
+    {
+        <MudText Typo="Typo.body2" Class="mt-4" Style="color: #7f1d1d;">
+            Request ID: <code>@RequestId</code>
+        </MudText>
+    }
+
+    <MudText Typo="Typo.body2" Class="mt-4" Style="color: #7f1d1d;">
+        Reload the page or return to the dashboard to continue.
+    </MudText>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Error" Class="mt-4 rounded-pill px-6" Href="/">
+        Back to Dashboard
+    </MudButton>
+</MudPaper>
+
+@code {
+    [SupplyParameterFromQuery(Name = "requestId")]
+    public string? RequestId { get; set; }
+}

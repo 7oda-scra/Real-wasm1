@@ -1,0 +1,21 @@
+@page "/counter"
+@attribute [Authorize]
+
+<PageTitle>Counter</PageTitle>
+
+<MudPaper Class="pa-8 mt-6 rounded-xl" Elevation="0" Style="border: 1px solid #e5e7eb;">
+    <MudText Typo="Typo.h4" Style="font-weight: 700;">Counter</MudText>
+    <MudText Typo="Typo.body1" Class="mt-3">Current count: @_currentCount</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4 rounded-pill px-6" OnClick="IncrementCount">
+        Click me
+    </MudButton>
+</MudPaper>
+
+@code {
+    private int _currentCount;
+
+    private void IncrementCount()
+    {
+        _currentCount++;
+    }
+}

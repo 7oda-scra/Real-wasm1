@@ -1,0 +1,115 @@
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: "Inter", "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f9fafb;
+}
+
+body {
+    color: #111827;
+}
+
+a,
+.btn-link {
+    color: #006bb7;
+}
+
+.loading-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background:
+        radial-gradient(circle at top, rgba(68, 171, 223, 0.16), transparent 35%),
+        #f9fafb;
+}
+
+.loading-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    border: 6px solid rgba(68, 171, 223, 0.18);
+    border-top-color: #44abdf;
+    animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.bento-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    height: 100%;
+    border: 1px solid #f0f0f0 !important;
+    background: #ffffff !important;
+}
+
+.bento-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, 0.05),
+        0 10px 10px rgba(0, 0, 0, 0.02) !important;
+    border-color: #44abdf !important;
+}
+
+.bento-card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(68, 171, 223, 0.12);
+    flex-shrink: 0;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+#blazor-error-ui {
+    background: #b91c1c;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    display: none;
+    left: 0;
+    padding: 0.75rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    float: right;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

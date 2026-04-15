@@ -1,0 +1,29 @@
+## Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+## .NET
+*.exe
+*.dll
+*.pdb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.pdb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Publishing
+/release/
+
+## OS
+.DS_Store
+Thumbs.db

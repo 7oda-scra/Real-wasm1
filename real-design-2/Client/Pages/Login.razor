@@ -1,0 +1,104 @@
+@page "/login"
+@layout Layout.EmptyLayout
+@attribute [AllowAnonymous]
+@using System.ComponentModel.DataAnnotations
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<div class="d-flex align-center justify-center mud-width-full" style="height: 100vh; background-color: var(--mud-palette-background);">
+    <MudCard Elevation="4" Class="pa-8 d-flex flex-column align-center" Style="max-width: 400px; width: 100%; border-radius: 12px;">
+        <img src="assets/main-logo.png" alt="Smart Code Logo" style="max-height: 60px; margin-bottom: 24px;" />
+
+        <MudText Typo="Typo.h5" Class="mb-6">Sign in to Smart Code ERP</MudText>
+
+        <EditForm Model="@_loginModel" OnValidSubmit="HandleLogin" style="width: 100%;">
+            <DataAnnotationsValidator />
+
+            @if (!string.IsNullOrWhiteSpace(_errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@_errorMessage</MudAlert>
+            }
+
+            <MudTextField @bind-Value="_loginModel.Username" Label="Username" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-4" />
+            <MudTextField @bind-Value="_loginModel.Password" Label="Password" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Password" Class="mb-2" />
+            <ValidationSummary class="validation-message mb-4" />
+
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="w-100" Disabled="@_isLoading">
+                @if (_isLoading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Signing in...</MudText>
+                }
+                else
+                {
+                    <text>Sign In</text>
+                }
+            </MudButton>
+        </EditForm>
+    </MudCard>
+</div>
+
+@code {
+    private readonly LoginModel _loginModel = new();
+    private bool _isLoading;
+    private string? _errorMessage;
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (AuthService.CurrentUser is not null)
+        {
+            NavigationManager.NavigateTo(GetSafeReturnUrl(), forceLoad: false);
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        _errorMessage = null;
+        _isLoading = true;
+
+        try
+        {
+            var result = await AuthService.LoginAsync(_loginModel.Username, _loginModel.Password);
+
+            if (result.Success)
+            {
+                NavigationManager.NavigateTo(GetSafeReturnUrl(), forceLoad: false);
+                return;
+            }
+
+            _errorMessage = "Invalid username or password.";
+        }
+        catch
+        {
+            _errorMessage = "The sign-in request failed. Please try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private string GetSafeReturnUrl()
+    {
+        if (string.IsNullOrWhiteSpace(ReturnUrl))
+        {
+            return "/";
+        }
+
+        return ReturnUrl.StartsWith('/') && !ReturnUrl.StartsWith("//", StringComparison.Ordinal)
+            ? ReturnUrl
+            : "/";
+    }
+
+    private sealed class LoginModel
+    {
+        [Required]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+    }
+}

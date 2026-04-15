@@ -1,0 +1,65 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using RealDesign2.Client.Layout
+@using MudBlazor
+
+<CascadingAuthenticationState>
+    <ErrorBoundary>
+        <ChildContent>
+            <Router AppAssembly="@typeof(Program).Assembly">
+                <Found Context="routeData">
+                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                        <NotAuthorized>
+                            @if (context.User.Identity?.IsAuthenticated == true)
+                            {
+                                <LayoutView Layout="@typeof(MainLayout)">
+                                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-6">
+                                        You do not have permission to view this page.
+                                    </MudAlert>
+                                </LayoutView>
+                            }
+                            else
+                            {
+                                <RedirectToLogin />
+                            }
+                        </NotAuthorized>
+                    </AuthorizeRouteView>
+                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                </Found>
+                <NotFound>
+                    <PageTitle>Not Found</PageTitle>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <MudPaper Class="pa-6 mt-6 rounded-xl" Elevation="0" Style="border: 1px solid #e5e7eb;">
+                            <MudText Typo="Typo.h5" Style="font-weight: 700;">Page not found</MudText>
+                            <MudText Typo="Typo.body1" Class="mt-2" Style="color: #6b7280;">
+                                Sorry, there is nothing at this address.
+                            </MudText>
+                        </MudPaper>
+                    </LayoutView>
+                </NotFound>
+            </Router>
+        </ChildContent>
+        <ErrorContent>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <MudPaper Class="pa-8 mt-6 rounded-xl" Elevation="0" Style="border: 1px solid #fecaca; background: #fef2f2;">
+                    <MudText Typo="Typo.h5" Style="font-weight: 700; color: #991b1b;">Something went wrong</MudText>
+                    <MudText Typo="Typo.body1" Class="mt-2" Style="color: #7f1d1d;">
+                        An unexpected error interrupted the current view. Reload the page to continue.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" Class="mt-4 rounded-pill px-6" OnClick="ReloadPage">
+                        Reload
+                    </MudButton>
+                </MudPaper>
+            </LayoutView>
+        </ErrorContent>
+    </ErrorBoundary>
+</CascadingAuthenticationState>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private void ReloadPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+}
