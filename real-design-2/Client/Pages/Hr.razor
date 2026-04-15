@@ -1,205 +1,431 @@
 @page "/hr"
 @attribute [Authorize]
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-6">
-    <MudGrid Spacing="6">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-6 mb-10">
+    <MudGrid Spacing="4">
         <MudItem xs="12" md="3" Class="@(string.IsNullOrEmpty(_activeForm) ? "d-block" : "d-none d-md-block")">
-            <MudPaper Elevation="0" Class="pa-4 rounded-xl" Style="border: 1px solid #f0f0f0;">
+            <MudPaper Elevation="0" Class="pa-4 rounded-xl hr-nav-shell">
+                <MudStack Spacing="1" Class="mb-4">
+                    <MudText Class="hr-section-kicker">People Platform</MudText>
+                    <MudText Typo="Typo.h5" Style="font-weight: 700; letter-spacing: -0.03em;">
+                        Human Resources
+                    </MudText>
+                    <MudText Typo="Typo.body2" Style="color: #64748b;">
+                        Configure master data, attendance rules, and payroll foundations from one polished control hub.
+                    </MudText>
+                </MudStack>
+
                 <MudNavMenu Bordered="true" Color="Color.Primary" Class="mud-width-full">
-                    <MudNavGroup Title="Employee Data" Expanded="true" Icon="@Icons.Material.Filled.FolderShared">
-                        <MudNavLink OnClick="@(() => SetActiveForm("Sectors"))">Sectors</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Departments"))">Departments</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Sections"))">Sections</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Positions/Jobs"))">Positions / Jobs</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Qualifications"))">Qualifications</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Employees"))" Class="@GetActiveCss("Employees")">Employees</MudNavLink>
-                    </MudNavGroup>
-
-                    <MudNavGroup Title="Shifts" Expanded="true" Icon="@Icons.Material.Filled.Schedule">
-                        <MudNavLink OnClick="@(() => SetActiveForm("Time and Attendance system"))">Time and Attendance</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Shifts"))">Shifts</MudNavLink>
-                    </MudNavGroup>
-
-                    <MudNavGroup Title="Salary Settings" Expanded="true" Icon="@Icons.Material.Filled.Paid">
-                        <MudNavLink OnClick="@(() => SetActiveForm("Salary Items"))">Salary Items</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Overtime settings"))">Overtime Settings</MudNavLink>
-                        <MudNavLink OnClick="@(() => SetActiveForm("Salary calculation rules"))">Salary Calculation Rules</MudNavLink>
-                    </MudNavGroup>
+                    @foreach (var navSection in _navigationSections)
+                    {
+                        <MudNavGroup Title="@(navSection.Title)" Expanded="true" Icon="@(navSection.Icon)">
+                            @foreach (var item in navSection.Items)
+                            {
+                                <MudNavLink OnClick="@(() => SetActiveForm(item.Key))" Class="@GetActiveCss(item.Key)">
+                                    @item.Label
+                                </MudNavLink>
+                            }
+                        </MudNavGroup>
+                    }
                 </MudNavMenu>
             </MudPaper>
         </MudItem>
 
         <MudItem xs="12" md="9" Class="@(string.IsNullOrEmpty(_activeForm) ? "d-none d-md-block" : "d-block")">
-            @if (string.IsNullOrEmpty(_activeForm))
+            @if (string.IsNullOrWhiteSpace(_activeForm))
             {
-                <MudPaper Elevation="0" Class="d-flex flex-column align-center justify-center rounded-xl" Style="height: 60vh; border: 1px dashed #e5e7eb; background: transparent;">
-                    <MudIcon Icon="@Icons.Material.Filled.Category" Style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;" />
-                    <MudText Typo="Typo.h6" Style="color: #9ca3af;">Select a module to view settings.</MudText>
-                </MudPaper>
-            }
-            else if (_activeForm == "Employees")
-            {
-                <MudStack Spacing="4">
-                    <MudPaper Elevation="0" Class="pa-4 rounded-xl" Style="border: 1px solid #f0f0f0;">
-                        <div class="d-flex align-center justify-space-between mb-4">
-                            <MudText Typo="Typo.h5" Style="font-weight: 700; letter-spacing: -0.5px;">
-                                <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Class="d-md-none mr-2" OnClick="CloseForm" />
-                                @_activeForm
-                            </MudText>
-                            <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary">
-                                @_employees.Count Employees
-                            </MudChip>
+                <MudPaper Elevation="0" Class="pa-10 rounded-xl hr-empty-state">
+                    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="3" Style="min-height: 60vh;">
+                        <div class="hr-placeholder-icon">
+                            <MudIcon Icon="@Icons.Material.Filled.Groups2" Size="Size.Large" Style="font-size: 3rem; color: #44abdf;" />
                         </div>
-
-                        <MudTable Items="_employees" Elevation="0" Hover="true" Dense="true" Class="employee-table" Breakpoint="Breakpoint.Sm">
-                            <HeaderContent>
-                                <MudTh>Name</MudTh>
-                                <MudTh>Title</MudTh>
-                                <MudTh>Department</MudTh>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd DataLabel="Name">@context.Name</MudTd>
-                                <MudTd DataLabel="Title">@context.Title</MudTd>
-                                <MudTd DataLabel="Department">@context.Department</MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    </MudPaper>
-
-                    <MudPaper Elevation="0" Class="pa-6 rounded-xl" Style="border: 1px solid #f0f0f0;">
-                        <FormActionToolbar
-                            OnAdd="HandleAdd"
-                            OnModify="HandleModify"
-                            OnDelete="HandleDelete"
-                            OnSave="HandleSave"
-                            OnClose="HandleToolbarClose" />
-
-                        <MudDivider Class="my-6" />
-
-                        <MudGrid Spacing="4">
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="_employeeName" Label="Employee Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
-                            </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="_employeeId" Label="Employee ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
-                            </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="_employeeTitle" Label="Job Title" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
-                            </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="_employeeEmail" Label="Email Address" Variant="Variant.Outlined" InputType="InputType.Email" Margin="Margin.Dense" FullWidth="true" />
-                            </MudItem>
-                            <MudItem xs="12" sm="6">
-                                <MudSelect @bind-Value="_employeeDepartment" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" AnchorOrigin="Origin.BottomCenter">
-                                    <MudSelectItem Value="@("Engineering")" />
-                                    <MudSelectItem Value="@("Support")" />
-                                    <MudSelectItem Value="@("Human Resources")" />
-                                    <MudSelectItem Value="@("Marketing")" />
-                                </MudSelect>
-                            </MudItem>
-                        </MudGrid>
-                    </MudPaper>
-                </MudStack>
+                        <MudText Class="hr-section-kicker">Workspace Ready</MudText>
+                        <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; letter-spacing: -0.04em;">
+                            Select an HR setup module
+                        </MudText>
+                        <MudText Typo="Typo.body1" Align="Align.Center" Style="max-width: 34rem; color: #64748b;">
+                            Pick a category from the left menu to manage your ERP reference data with a unified table-first editing experience.
+                        </MudText>
+                    </MudStack>
+                </MudPaper>
             }
             else
             {
-                <MudPaper Elevation="0" Class="pa-6 rounded-xl" Style="border: 1px solid #f0f0f0;">
-                    <div class="d-flex align-center justify-space-between mb-4">
-                        <MudText Typo="Typo.h5" Style="font-weight: 700; letter-spacing: -0.5px;">
-                            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Class="d-md-none mr-2" OnClick="CloseForm" />
-                            @_activeForm
-                        </MudText>
-                        <MudStack Row="true" Spacing="2">
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="rounded-pill px-6" Style="text-transform: none; font-weight: 600;">Save</MudButton>
-                            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" OnClick="CloseForm" Class="d-none d-md-flex" />
-                        </MudStack>
-                    </div>
+                @switch (_activeForm)
+                {
+                    case HrViewKeys.Sectors:
+                        @RenderBasicCrud(
+                            _sectors,
+                            _sectorDraft,
+                            "Sectors",
+                            "Define the top-level people and operations domains that shape reporting, ownership, and downstream HR segmentation.",
+                            $"{_sectors.Count} configured",
+                            "Sector profile",
+                            Icons.Material.Filled.Apartment,
+                            "Sector ID",
+                            "Sector Name")
+                        break;
 
-                    <MudDivider Class="mb-6" />
+                    case HrViewKeys.Departments:
+                        @RenderBasicCrud(
+                            _departments,
+                            _departmentDraft,
+                            "Departments",
+                            "Shape the functional teams that power approvals, cost centers, staffing plans, and operational ownership.",
+                            $"{_departments.Count} configured",
+                            "Department profile",
+                            Icons.Material.Filled.AccountTree,
+                            "Department ID",
+                            "Department Name")
+                        break;
 
-                    <div class="d-flex flex-column align-center justify-center pa-16">
-                        <MudIcon Icon="@Icons.Material.Filled.Build" Style="font-size: 3rem; color: #e5e7eb; margin-bottom: 1rem;" />
-                        <MudText Typo="Typo.body1" Style="color: #6b7280;">Form template for @_activeForm is not yet implemented.</MudText>
-                    </div>
-                </MudPaper>
+                    case HrViewKeys.Sections:
+                        @RenderBasicCrud(
+                            _sections,
+                            _sectionDraft,
+                            "Sections",
+                            "Capture the smaller operating cells that sit inside departments and keep structure ready for granular access and staffing.",
+                            $"{_sections.Count} configured",
+                            "Section profile",
+                            Icons.Material.Filled.GridView,
+                            "Section ID",
+                            "Section Name")
+                        break;
+
+                    case HrViewKeys.Jobs:
+                        @RenderBasicCrud(
+                            _jobs,
+                            _jobDraft,
+                            "Positions & Jobs",
+                            "Curate role catalogs with clean identifiers so recruiting, org charts, and workforce planning speak the same language.",
+                            $"{_jobs.Count} configured",
+                            "Job profile",
+                            Icons.Material.Filled.WorkOutline,
+                            "Job ID",
+                            "Job Title")
+                        break;
+
+                    case HrViewKeys.Qualifications:
+                        @RenderBasicCrud(
+                            _qualifications,
+                            _qualificationDraft,
+                            "Qualifications",
+                            "Standardize credential tiers and benchmark requirements so hiring and promotion workflows stay consistent.",
+                            $"{_qualifications.Count} configured",
+                            "Qualification profile",
+                            Icons.Material.Filled.School,
+                            "Qualification ID",
+                            "Qualification Name")
+                        break;
+
+                    case HrViewKeys.Employees:
+                        @RenderEmployeeCrud()
+                        break;
+
+                    case HrViewKeys.AttendanceSystems:
+                        @RenderAttendanceSystemCrud()
+                        break;
+
+                    case HrViewKeys.Shifts:
+                        @RenderShiftCrud()
+                        break;
+
+                    case HrViewKeys.SalaryItems:
+                        @RenderBasicCrud(
+                            _salaryItems,
+                            _salaryItemDraft,
+                            "Salary Items",
+                            "Keep payroll ingredients tidy and reusable so allowances, deductions, and compensation components can scale cleanly.",
+                            $"{_salaryItems.Count} configured",
+                            "Payroll component",
+                            Icons.Material.Filled.Payments,
+                            "Salary Item ID",
+                            "Salary Item Name")
+                        break;
+
+                    case HrViewKeys.OvertimeSettings:
+                        @RenderBasicCrud(
+                            _overtimeSettings,
+                            _overtimeSettingDraft,
+                            "Overtime Settings",
+                            "Define standard overtime packages with the same clean CRUD surface used by the broader HR and payroll ecosystem.",
+                            $"{_overtimeSettings.Count} configured",
+                            "Overtime package",
+                            Icons.Material.Filled.Timelapse,
+                            "Overtime Setting ID",
+                            "Overtime Setting Name")
+                        break;
+
+                    case HrViewKeys.SalaryCalculationRules:
+                        @RenderBasicCrud(
+                            _salaryCalculationRules,
+                            _salaryCalculationRuleDraft,
+                            "Salary Calculation Rules",
+                            "Capture reusable payroll calculation definitions with the same minimal, high-clarity editing pattern.",
+                            $"{_salaryCalculationRules.Count} configured",
+                            "Calculation rule",
+                            Icons.Material.Filled.Rule,
+                            "Rule ID",
+                            "Rule Name")
+                        break;
+
+                    default:
+                        <MudPaper Elevation="0" Class="pa-10 rounded-xl hr-placeholder-shell">
+                            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="3" Style="min-height: 26rem;">
+                                <div class="hr-placeholder-icon">
+                                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Size="Size.Large" Style="font-size: 3rem; color: #44abdf;" />
+                                </div>
+                                <MudText Class="hr-section-kicker">In Progress</MudText>
+                                <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; letter-spacing: -0.04em;">
+                                    @_activeForm
+                                </MudText>
+                                <MudText Typo="Typo.body1" Align="Align.Center" Style="max-width: 32rem; color: #64748b;">
+                                    This workspace is ready for the dynamic CRUD pattern and can be connected to a dedicated DTO set whenever the next phase starts.
+                                </MudText>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="rounded-pill px-6" Style="text-transform: none;" OnClick="HandleToolbarClose">
+                                    Close
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                        break;
+                }
             }
         </MudItem>
     </MudGrid>
 </MudContainer>
 
 @code {
-    private string _activeForm = "Employees";
-    private readonly List<EmployeeMock> _employees =
-    [
-        new EmployeeMock
-        {
-            Id = 1,
-            Name = "Mahmoud Diaa",
-            Title = "Frontend Programmer",
-            Email = "mahmoud.diaa@smartcode.local",
-            Department = "Engineering"
-        },
-        new EmployeeMock
-        {
-            Id = 2,
-            Name = "Ahmed Samak",
-            Title = "Tech Support",
-            Email = "ahmed.samak@smartcode.local",
-            Department = "Support"
-        }
-    ];
+    private RenderFragment RenderBasicCrud<T>(
+        List<T> items,
+        T draft,
+        string title,
+        string description,
+        string badgeText,
+        string pillLabel,
+        string pillIcon,
+        string idLabel,
+        string nameLabel)
+        where T : BaseDto, new()
+        => @<DynamicCrudView TItem="T"
+                             Title="@title"
+                             Description="@description"
+                             BadgeText="@badgeText"
+                             Items="@items"
+                             ShowBackButton="true"
+                             OnAdd="HandleAdd"
+                             OnModify="HandleModify"
+                             OnDelete="HandleDelete"
+                             OnSave="HandleSave"
+                             OnClose="HandleToolbarClose"
+                             OnBack="HandleToolbarClose">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Name</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="item">
+                    <MudTd DataLabel="ID">@item.Id</MudTd>
+                    <MudTd DataLabel="Name">@item.Name</MudTd>
+                </RowTemplate>
+                <ChildContent>
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12">
+                            <span class="hr-stat-pill">
+                                <MudIcon Icon="@pillIcon" Size="Size.Small" />
+                                @pillLabel
+                            </span>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="draft.Id" Label="@idLabel" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="draft.Name" Label="@nameLabel" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </DynamicCrudView>;
 
-    private string _employeeName = string.Empty;
-    private string _employeeId = string.Empty;
-    private string _employeeTitle = string.Empty;
-    private string _employeeEmail = string.Empty;
-    private string _employeeDepartment = string.Empty;
+    private RenderFragment RenderEmployeeCrud()
+        => @<DynamicCrudView TItem="EmployeeRecord"
+                             Title="Employees"
+                             Description="Keep a polished live directory for the workforce while preserving the same CRUD experience used across all HR setup modules."
+                             BadgeText="@($"{_employees.Count} employees")"
+                             Items="_employees"
+                             ShowBackButton="true"
+                             OnAdd="HandleAdd"
+                             OnModify="HandleModify"
+                             OnDelete="HandleDelete"
+                             OnSave="HandleSave"
+                             OnClose="HandleToolbarClose"
+                             OnBack="HandleToolbarClose">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Title</MudTh>
+                    <MudTh>Department</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="employee">
+                    <MudTd DataLabel="Name">@employee.Name</MudTd>
+                    <MudTd DataLabel="Title">@employee.Title</MudTd>
+                    <MudTd DataLabel="Department">@employee.Department</MudTd>
+                </RowTemplate>
+                <ChildContent>
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12">
+                            <span class="hr-stat-pill">
+                                <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" />
+                                Employee profile
+                            </span>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_employeeDraft.Id" Label="Employee ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_employeeDraft.Name" Label="Employee Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_employeeDraft.Title" Label="Job Title" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_employeeDraft.Email" Label="Email Address" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Email" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudSelect T="string" @bind-Value="_employeeDraft.Department" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true">
+                                @foreach (var department in _departments)
+                                {
+                                    <MudSelectItem T="string" Value="@department.Name">@department.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </DynamicCrudView>;
 
-    private string GetActiveCss(string formName)
-    {
-        return _activeForm == formName ? "mud-nav-link-active" : string.Empty;
-    }
+    private RenderFragment RenderAttendanceSystemCrud()
+        => @<DynamicCrudView TItem="AttendanceSystem"
+                             Title="Time & Attendance Systems"
+                             Description="Define how shifts are monitored and audited. Each system locks into one clean tracking mode to keep rules unambiguous."
+                             BadgeText="@($"{_attendanceSystems.Count} systems")"
+                             Items="_attendanceSystems"
+                             ShowBackButton="true"
+                             OnAdd="HandleAdd"
+                             OnModify="HandleModify"
+                             OnDelete="HandleDelete"
+                             OnSave="HandleSave"
+                             OnClose="HandleToolbarClose"
+                             OnBack="HandleToolbarClose">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Tracking Type</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="attendanceSystem">
+                    <MudTd DataLabel="ID">@attendanceSystem.Id</MudTd>
+                    <MudTd DataLabel="Name">@attendanceSystem.Name</MudTd>
+                    <MudTd DataLabel="Tracking Type">@GetTrackingTypeLabel(attendanceSystem.TrackingType)</MudTd>
+                </RowTemplate>
+                <ChildContent>
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12">
+                            <span class="hr-stat-pill">
+                                <MudIcon Icon="@Icons.Material.Filled.Fingerprint" Size="Size.Small" />
+                                Tracking policy
+                            </span>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_attendanceSystemDraft.Id" Label="Attendance System ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_attendanceSystemDraft.Name" Label="Attendance System Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudPaper Elevation="0" Class="pa-4 rounded-xl hr-toggle-panel">
+                                <MudStack Spacing="1" Class="mb-2">
+                                    <MudText Typo="Typo.subtitle2" Style="font-weight: 600;">Tracking mode</MudText>
+                                    <MudText Typo="Typo.body2" Style="color: #64748b;">
+                                        Choose the single monitoring mode enforced by this attendance system.
+                                    </MudText>
+                                </MudStack>
+                                <MudRadioGroup T="AttendanceTrackingType" @bind-Value="_attendanceSystemDraft.TrackingType">
+                                    <MudRadio T="AttendanceTrackingType" Value="@AttendanceTrackingType.FingerprintRequired">Fingerprint Required</MudRadio>
+                                    <MudRadio T="AttendanceTrackingType" Value="@AttendanceTrackingType.OpenShift">Open Shift</MudRadio>
+                                </MudRadioGroup>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </DynamicCrudView>;
 
-    private void SetActiveForm(string formName)
-    {
-        _activeForm = formName;
-    }
-
-    private void CloseForm()
-    {
-        _activeForm = string.Empty;
-    }
-
-    private void HandleAdd(MouseEventArgs _)
-    {
-    }
-
-    private void HandleModify(MouseEventArgs _)
-    {
-    }
-
-    private void HandleDelete(MouseEventArgs _)
-    {
-    }
-
-    private void HandleSave(MouseEventArgs _)
-    {
-    }
-
-    private void HandleToolbarClose(MouseEventArgs _)
-    {
-        CloseForm();
-    }
-
-    private sealed class EmployeeMock
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; } = string.Empty;
-
-        public string Title { get; set; } = string.Empty;
-
-        public string Email { get; set; } = string.Empty;
-
-        public string Department { get; set; } = string.Empty;
-    }
+    private RenderFragment RenderShiftCrud()
+        => @<DynamicCrudView TItem="Shift"
+                             Title="Shifts"
+                             Description="Compose schedules around attendance systems, premium time inputs, and next-day behavior for overnight operations."
+                             BadgeText="@($"{_shifts.Count} shifts")"
+                             Items="_shifts"
+                             ShowBackButton="true"
+                             OnAdd="HandleAdd"
+                             OnModify="HandleModify"
+                             OnDelete="HandleDelete"
+                             OnSave="HandleSave"
+                             OnClose="HandleToolbarClose"
+                             OnBack="HandleToolbarClose">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Attendance System</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="shift">
+                    <MudTd DataLabel="ID">@shift.Id</MudTd>
+                    <MudTd DataLabel="Name">@shift.Name</MudTd>
+                    <MudTd DataLabel="Attendance System">@GetAttendanceSystemName(shift.AttendanceSystemId)</MudTd>
+                </RowTemplate>
+                <ChildContent>
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12">
+                            <span class="hr-stat-pill">
+                                <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" />
+                                Shift configuration
+                            </span>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_shiftDraft.Id" Label="Shift ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_shiftDraft.Name" Label="Shift Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudSelect T="string" @bind-Value="_shiftDraft.AttendanceSystemId" Label="Attendance System" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true">
+                                @foreach (var attendanceSystem in _attendanceSystems)
+                                {
+                                    <MudSelectItem T="string" Value="@attendanceSystem.Id">@attendanceSystem.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudNumericField T="int" @bind-Value="_shiftDraft.WorkingHours" Label="Working Hours" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Max="24" FullWidth="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudPaper Elevation="0" Class="pa-4 rounded-xl hr-accent-card">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
+                                    <MudText Typo="Typo.subtitle2" Style="font-weight: 600;">Starts At</MudText>
+                                    <MudIcon Icon="@Icons.Material.Filled.WbSunny" Color="Color.Primary" />
+                                </MudStack>
+                                <MudTimePicker @bind-Time="_shiftDraft.StartTime" Label="Start time" Variant="Variant.Outlined" Margin="Margin.Dense" AmPm="true" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudPaper Elevation="0" Class="pa-4 rounded-xl hr-accent-card">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
+                                    <MudText Typo="Typo.subtitle2" Style="font-weight: 600;">Ends At</MudText>
+                                    <MudIcon Icon="@Icons.Material.Filled.Bedtime" Color="Color.Secondary" />
+                                </MudStack>
+                                <MudTimePicker @bind-Time="_shiftDraft.EndTime" Label="End time" Variant="Variant.Outlined" Margin="Margin.Dense" AmPm="true" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudPaper Elevation="0" Class="pa-4 rounded-xl hr-toggle-panel">
+                                <MudSwitch T="bool" @bind-Value="_shiftDraft.ClosesNextDay" Label="Closing next day" Color="Color.Primary" />
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </DynamicCrudView>;
 }

@@ -24,6 +24,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IAuthSessionStore, InMemoryAuthSessionStore>();
 builder.Services.AddScoped<IAuthService, ApiAuthService>();
 builder.Services.AddScoped<IModuleService, ApiModuleService>();
+builder.Services.AddScoped<HrMockDataService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 await builder.Build().RunAsync();

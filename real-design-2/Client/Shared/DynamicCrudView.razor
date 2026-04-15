@@ -1,0 +1,114 @@
+@typeparam TItem where TItem : class
+
+<MudStack Spacing="3" Class="dynamic-crud-view">
+    <MudPaper Elevation="0" Class="pa-5 rounded-xl dynamic-crud-view__table-shell">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Class="mb-4 flex-wrap">
+            <MudStack Spacing="1">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    @if (ShowBackButton)
+                    {
+                        <MudIconButton
+                            Icon="@Icons.Material.Filled.ArrowBack"
+                            Color="Color.Default"
+                            Class="d-md-none"
+                            OnClick="OnBack" />
+                    }
+
+                    <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
+                </MudStack>
+
+                @if (!string.IsNullOrWhiteSpace(Description))
+                {
+                    <MudText Typo="Typo.body2" Class="dynamic-crud-view__description">@Description</MudText>
+                }
+            </MudStack>
+
+            @if (!string.IsNullOrWhiteSpace(BadgeText))
+            {
+                <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Class="dynamic-crud-view__chip">
+                    @BadgeText
+                </MudChip>
+            }
+        </MudStack>
+
+        <MudTable T="TItem"
+                  Items="Items"
+                  Elevation="0"
+                  Hover="true"
+                  Dense="true"
+                  Breakpoint="Breakpoint.Sm"
+                  Class="dynamic-crud-view__table">
+            <HeaderContent>
+                @HeaderContent
+            </HeaderContent>
+            <RowTemplate>
+                @if (RowTemplate is not null)
+                {
+                    @RowTemplate(context)
+                }
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Class="pa-6 rounded-xl dynamic-crud-view__form-shell">
+        <FormActionToolbar
+            OnAdd="OnAdd"
+            OnModify="OnModify"
+            OnDelete="OnDelete"
+            OnSave="OnSave"
+            OnClose="OnClose" />
+
+        <MudDivider Class="my-5" />
+
+        @if (ChildContent is not null)
+        {
+            <div class="dynamic-crud-view__form-body">
+                @ChildContent
+            </div>
+        }
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string BadgeText { get; set; } = string.Empty;
+
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnAdd { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnModify { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnBack { get; set; }
+
+    [Parameter]
+    public bool ShowBackButton { get; set; }
+}
