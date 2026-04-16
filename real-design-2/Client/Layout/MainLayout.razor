@@ -8,11 +8,14 @@
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<MudBreakpointProvider OnBreakpointChanged="HandleBreakpointChanged" />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
-        <img src="assets/main-logo.png" alt="Smart Code Logo" style="max-height: 40px; margin-left: 10px;" />
+    <MudAppBar Elevation="1" Class="app-shell__appbar">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="app-shell__brand">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" Class="app-shell__menu-trigger" OnClick="ToggleDrawer" />
+            <img src="assets/main-logo.png" alt="Smart Code Logo" class="app-shell__logo" />
+        </MudStack>
         <MudSpacer />
 
         <AuthorizeView>
@@ -21,7 +24,7 @@
                 {
                     <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
                         <ActivatorContent Context="menuActivator">
-                            <MudAvatar Color="Color.Secondary" Style="cursor: pointer;">
+                            <MudAvatar Color="Color.Secondary" Class="app-shell__avatar">
                                 @GetAvatarInitial()
                             </MudAvatar>
                         </ActivatorContent>
@@ -36,12 +39,18 @@
         </AuthorizeView>
     </MudAppBar>
 
-    <MudDrawer @bind-Open="_drawerOpen" Variant="@DrawerVariant.Mini" Elevation="1" ClipMode="DrawerClipMode.Always">
+    <MudDrawer @bind-Open="_drawerOpen"
+               Variant="DrawerVariant.Responsive"
+               Breakpoint="Breakpoint.Md"
+               Elevation="1"
+               ClipMode="DrawerClipMode.Always"
+               Overlay="true"
+               Class="app-shell__drawer">
         <NavMenu />
     </MudDrawer>
 
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4 pt-4">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="app-shell__body-container">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -54,19 +63,23 @@
 </div>
 
 @code {
-    private bool _drawerOpen = true;
+    private bool _drawerOpen;
     private bool _isLoggingOut;
     private UserDto? _currentUser;
+    private Breakpoint _currentBreakpoint = Breakpoint.Xs;
+    private bool _hasResolvedBreakpoint;
 
     protected override void OnInitialized()
     {
         _currentUser = AuthService.CurrentUser;
         AuthService.OnAuthStateChanged += HandleAuthStateChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
     }
 
     public void Dispose()
     {
         AuthService.OnAuthStateChanged -= HandleAuthStateChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 
     private void HandleAuthStateChanged(UserDto? user)
@@ -88,6 +101,37 @@
     private void ToggleDrawer()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private void HandleBreakpointChanged(Breakpoint breakpoint)
+    {
+        _currentBreakpoint = breakpoint;
+
+        if (!_hasResolvedBreakpoint)
+        {
+            _drawerOpen = !IsMobileBreakpoint(breakpoint);
+            _hasResolvedBreakpoint = true;
+        }
+        else if (!IsMobileBreakpoint(breakpoint) && !_drawerOpen)
+        {
+            _drawerOpen = true;
+        }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (!IsMobileBreakpoint(_currentBreakpoint))
+        {
+            return;
+        }
+
+        _drawerOpen = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private static bool IsMobileBreakpoint(Breakpoint breakpoint)
+    {
+        return breakpoint is Breakpoint.Xs or Breakpoint.Sm;
     }
 
     private async Task LogoutAsync()

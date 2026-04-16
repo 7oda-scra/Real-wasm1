@@ -42,6 +42,46 @@ a,
     font-weight: 500;
 }
 
+.app-shell__appbar {
+    padding: 0.55rem 0.9rem;
+    backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.app-shell__brand {
+    min-width: 0;
+}
+
+.app-shell__menu-trigger {
+    margin-right: 0.15rem;
+}
+
+.app-shell__logo {
+    width: auto;
+    max-height: 38px;
+    display: block;
+}
+
+.app-shell__avatar {
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.app-shell__drawer {
+    border-right: 1px solid rgba(226, 232, 240, 0.95);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+}
+
+.app-shell__body-container {
+    margin-top: 1rem;
+    margin-bottom: 1.75rem;
+    padding-top: 0.75rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
 .bento-card {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
@@ -175,6 +215,10 @@ a,
     background: rgba(255, 255, 255, 0.9);
 }
 
+.dynamic-crud-view .mud-table-container {
+    border-radius: 22px;
+}
+
 .dynamic-crud-view__table .mud-table-head .mud-table-cell {
     font-size: 0.76rem;
     letter-spacing: 0.08em;
@@ -191,6 +235,32 @@ a,
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+}
+
+.responsive-surface-padding {
+    padding: 1rem !important;
+}
+
+.responsive-surface-padding-lg {
+    padding: 1.5rem !important;
+}
+
+.form-action-toolbar {
+    row-gap: 0.65rem;
+}
+
+.form-action-toolbar__button {
+    padding: 0.5rem 1rem;
+    min-width: 7rem;
+}
+
+.form-action-toolbar__button--primary {
+    padding-inline: 1.35rem;
+}
+
+.form-action-toolbar__close {
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 999px;
 }
 
 .hr-section-kicker {
@@ -247,8 +317,96 @@ a,
     font-weight: 600;
 }
 
+.hr-page-shell {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.hr-mobile-back-button {
+    align-self: flex-start;
+    padding-inline: 1rem;
+    box-shadow: 0 14px 28px rgba(68, 171, 223, 0.18);
+    text-transform: none;
+    font-weight: 600;
+}
+
 @media (max-width: 959.98px) {
+    .app-shell__appbar {
+        padding: 0.45rem 0.7rem;
+    }
+
+    .app-shell__logo {
+        max-height: 32px;
+    }
+
+    .app-shell__body-container {
+        margin-top: 0.35rem;
+        margin-bottom: 1rem;
+        padding-top: 0.35rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
     .hr-nav-shell {
         position: static;
+    }
+
+    .dynamic-crud-view__title {
+        font-size: 1.2rem;
+    }
+
+    .dynamic-crud-view__table {
+        border-radius: 20px;
+    }
+
+    .dynamic-crud-view__description {
+        font-size: 0.92rem;
+    }
+
+    .hr-placeholder-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 24px;
+    }
+
+    .hr-empty-state {
+        min-height: auto;
+    }
+}
+
+@media (min-width: 960px) {
+    .responsive-surface-padding {
+        padding: 1.5rem !important;
+    }
+
+    .responsive-surface-padding-lg {
+        padding: 2.5rem !important;
+    }
+}
+
+@media (max-width: 599.98px) {
+    .form-action-toolbar {
+        justify-content: stretch !important;
+    }
+
+    .form-action-toolbar__button {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 0;
+        font-size: 0.82rem;
+        padding: 0.42rem 0.85rem;
+    }
+
+    .form-action-toolbar__close {
+        margin-left: auto;
+    }
+
+    .dynamic-crud-view__chip {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hr-mobile-back-button {
+        width: 100%;
+        justify-content: center;
     }
 }

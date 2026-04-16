@@ -1,10 +1,10 @@
 @page "/hr"
 @attribute [Authorize]
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-6 mb-10">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="hr-page-shell">
     <MudGrid Spacing="4">
         <MudItem xs="12" md="3" Class="@(string.IsNullOrEmpty(_activeForm) ? "d-block" : "d-none d-md-block")">
-            <MudPaper Elevation="0" Class="pa-4 rounded-xl hr-nav-shell">
+            <MudPaper Elevation="0" Class="rounded-xl hr-nav-shell responsive-surface-padding">
                 <MudStack Spacing="1" Class="mb-4">
                     <MudText Class="hr-section-kicker">People Platform</MudText>
                     <MudText Typo="Typo.h5" Style="font-weight: 700; letter-spacing: -0.03em;">
@@ -34,7 +34,7 @@
         <MudItem xs="12" md="9" Class="@(string.IsNullOrEmpty(_activeForm) ? "d-none d-md-block" : "d-block")">
             @if (string.IsNullOrWhiteSpace(_activeForm))
             {
-                <MudPaper Elevation="0" Class="pa-10 rounded-xl hr-empty-state">
+                <MudPaper Elevation="0" Class="rounded-xl hr-empty-state responsive-surface-padding-lg">
                     <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="3" Style="min-height: 60vh;">
                         <div class="hr-placeholder-icon">
                             <MudIcon Icon="@Icons.Material.Filled.Groups2" Size="Size.Large" Style="font-size: 3rem; color: #44abdf;" />
@@ -51,144 +51,154 @@
             }
             else
             {
-                @switch (_activeForm)
-                {
-                    case HrViewKeys.Sectors:
-                        @RenderBasicCrud(
-                            _sectors,
-                            _sectorDraft,
-                            "Sectors",
-                            "Define the top-level people and operations domains that shape reporting, ownership, and downstream HR segmentation.",
-                            $"{_sectors.Count} configured",
-                            "Sector profile",
-                            Icons.Material.Filled.Apartment,
-                            "Sector ID",
-                            "Sector Name")
-                        break;
+                <MudStack Spacing="3">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.ArrowBack"
+                               Class="rounded-pill d-md-none hr-mobile-back-button"
+                               OnClick="HandleToolbarClose">
+                        Back to Menu
+                    </MudButton>
 
-                    case HrViewKeys.Departments:
-                        @RenderBasicCrud(
-                            _departments,
-                            _departmentDraft,
-                            "Departments",
-                            "Shape the functional teams that power approvals, cost centers, staffing plans, and operational ownership.",
-                            $"{_departments.Count} configured",
-                            "Department profile",
-                            Icons.Material.Filled.AccountTree,
-                            "Department ID",
-                            "Department Name")
-                        break;
+                    @switch (_activeForm)
+                    {
+                        case HrViewKeys.Sectors:
+                            @RenderBasicCrud(
+                                _sectors,
+                                _sectorDraft,
+                                "Sectors",
+                                "Define the top-level people and operations domains that shape reporting, ownership, and downstream HR segmentation.",
+                                $"{_sectors.Count} configured",
+                                "Sector profile",
+                                Icons.Material.Filled.Apartment,
+                                "Sector ID",
+                                "Sector Name")
+                            break;
 
-                    case HrViewKeys.Sections:
-                        @RenderBasicCrud(
-                            _sections,
-                            _sectionDraft,
-                            "Sections",
-                            "Capture the smaller operating cells that sit inside departments and keep structure ready for granular access and staffing.",
-                            $"{_sections.Count} configured",
-                            "Section profile",
-                            Icons.Material.Filled.GridView,
-                            "Section ID",
-                            "Section Name")
-                        break;
+                        case HrViewKeys.Departments:
+                            @RenderBasicCrud(
+                                _departments,
+                                _departmentDraft,
+                                "Departments",
+                                "Shape the functional teams that power approvals, cost centers, staffing plans, and operational ownership.",
+                                $"{_departments.Count} configured",
+                                "Department profile",
+                                Icons.Material.Filled.AccountTree,
+                                "Department ID",
+                                "Department Name")
+                            break;
 
-                    case HrViewKeys.Jobs:
-                        @RenderBasicCrud(
-                            _jobs,
-                            _jobDraft,
-                            "Positions & Jobs",
-                            "Curate role catalogs with clean identifiers so recruiting, org charts, and workforce planning speak the same language.",
-                            $"{_jobs.Count} configured",
-                            "Job profile",
-                            Icons.Material.Filled.WorkOutline,
-                            "Job ID",
-                            "Job Title")
-                        break;
+                        case HrViewKeys.Sections:
+                            @RenderBasicCrud(
+                                _sections,
+                                _sectionDraft,
+                                "Sections",
+                                "Capture the smaller operating cells that sit inside departments and keep structure ready for granular access and staffing.",
+                                $"{_sections.Count} configured",
+                                "Section profile",
+                                Icons.Material.Filled.GridView,
+                                "Section ID",
+                                "Section Name")
+                            break;
 
-                    case HrViewKeys.Qualifications:
-                        @RenderBasicCrud(
-                            _qualifications,
-                            _qualificationDraft,
-                            "Qualifications",
-                            "Standardize credential tiers and benchmark requirements so hiring and promotion workflows stay consistent.",
-                            $"{_qualifications.Count} configured",
-                            "Qualification profile",
-                            Icons.Material.Filled.School,
-                            "Qualification ID",
-                            "Qualification Name")
-                        break;
+                        case HrViewKeys.Jobs:
+                            @RenderBasicCrud(
+                                _jobs,
+                                _jobDraft,
+                                "Positions & Jobs",
+                                "Curate role catalogs with clean identifiers so recruiting, org charts, and workforce planning speak the same language.",
+                                $"{_jobs.Count} configured",
+                                "Job profile",
+                                Icons.Material.Filled.WorkOutline,
+                                "Job ID",
+                                "Job Title")
+                            break;
 
-                    case HrViewKeys.Employees:
-                        @RenderEmployeeCrud()
-                        break;
+                        case HrViewKeys.Qualifications:
+                            @RenderBasicCrud(
+                                _qualifications,
+                                _qualificationDraft,
+                                "Qualifications",
+                                "Standardize credential tiers and benchmark requirements so hiring and promotion workflows stay consistent.",
+                                $"{_qualifications.Count} configured",
+                                "Qualification profile",
+                                Icons.Material.Filled.School,
+                                "Qualification ID",
+                                "Qualification Name")
+                            break;
 
-                    case HrViewKeys.AttendanceSystems:
-                        @RenderAttendanceSystemCrud()
-                        break;
+                        case HrViewKeys.Employees:
+                            @RenderEmployeeCrud()
+                            break;
 
-                    case HrViewKeys.Shifts:
-                        @RenderShiftCrud()
-                        break;
+                        case HrViewKeys.AttendanceSystems:
+                            @RenderAttendanceSystemCrud()
+                            break;
 
-                    case HrViewKeys.SalaryItems:
-                        @RenderBasicCrud(
-                            _salaryItems,
-                            _salaryItemDraft,
-                            "Salary Items",
-                            "Keep payroll ingredients tidy and reusable so allowances, deductions, and compensation components can scale cleanly.",
-                            $"{_salaryItems.Count} configured",
-                            "Payroll component",
-                            Icons.Material.Filled.Payments,
-                            "Salary Item ID",
-                            "Salary Item Name")
-                        break;
+                        case HrViewKeys.Shifts:
+                            @RenderShiftCrud()
+                            break;
 
-                    case HrViewKeys.OvertimeSettings:
-                        @RenderBasicCrud(
-                            _overtimeSettings,
-                            _overtimeSettingDraft,
-                            "Overtime Settings",
-                            "Define standard overtime packages with the same clean CRUD surface used by the broader HR and payroll ecosystem.",
-                            $"{_overtimeSettings.Count} configured",
-                            "Overtime package",
-                            Icons.Material.Filled.Timelapse,
-                            "Overtime Setting ID",
-                            "Overtime Setting Name")
-                        break;
+                        case HrViewKeys.SalaryItems:
+                            @RenderBasicCrud(
+                                _salaryItems,
+                                _salaryItemDraft,
+                                "Salary Items",
+                                "Keep payroll ingredients tidy and reusable so allowances, deductions, and compensation components can scale cleanly.",
+                                $"{_salaryItems.Count} configured",
+                                "Payroll component",
+                                Icons.Material.Filled.Payments,
+                                "Salary Item ID",
+                                "Salary Item Name")
+                            break;
 
-                    case HrViewKeys.SalaryCalculationRules:
-                        @RenderBasicCrud(
-                            _salaryCalculationRules,
-                            _salaryCalculationRuleDraft,
-                            "Salary Calculation Rules",
-                            "Capture reusable payroll calculation definitions with the same minimal, high-clarity editing pattern.",
-                            $"{_salaryCalculationRules.Count} configured",
-                            "Calculation rule",
-                            Icons.Material.Filled.Rule,
-                            "Rule ID",
-                            "Rule Name")
-                        break;
+                        case HrViewKeys.OvertimeSettings:
+                            @RenderBasicCrud(
+                                _overtimeSettings,
+                                _overtimeSettingDraft,
+                                "Overtime Settings",
+                                "Define standard overtime packages with the same clean CRUD surface used by the broader HR and payroll ecosystem.",
+                                $"{_overtimeSettings.Count} configured",
+                                "Overtime package",
+                                Icons.Material.Filled.Timelapse,
+                                "Overtime Setting ID",
+                                "Overtime Setting Name")
+                            break;
 
-                    default:
-                        <MudPaper Elevation="0" Class="pa-10 rounded-xl hr-placeholder-shell">
-                            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="3" Style="min-height: 26rem;">
-                                <div class="hr-placeholder-icon">
-                                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Size="Size.Large" Style="font-size: 3rem; color: #44abdf;" />
-                                </div>
-                                <MudText Class="hr-section-kicker">In Progress</MudText>
-                                <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; letter-spacing: -0.04em;">
-                                    @_activeForm
-                                </MudText>
-                                <MudText Typo="Typo.body1" Align="Align.Center" Style="max-width: 32rem; color: #64748b;">
-                                    This workspace is ready for the dynamic CRUD pattern and can be connected to a dedicated DTO set whenever the next phase starts.
-                                </MudText>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="rounded-pill px-6" Style="text-transform: none;" OnClick="HandleToolbarClose">
-                                    Close
-                                </MudButton>
-                            </MudStack>
-                        </MudPaper>
-                        break;
-                }
+                        case HrViewKeys.SalaryCalculationRules:
+                            @RenderBasicCrud(
+                                _salaryCalculationRules,
+                                _salaryCalculationRuleDraft,
+                                "Salary Calculation Rules",
+                                "Capture reusable payroll calculation definitions with the same minimal, high-clarity editing pattern.",
+                                $"{_salaryCalculationRules.Count} configured",
+                                "Calculation rule",
+                                Icons.Material.Filled.Rule,
+                                "Rule ID",
+                                "Rule Name")
+                            break;
+
+                        default:
+                            <MudPaper Elevation="0" Class="rounded-xl hr-placeholder-shell responsive-surface-padding-lg">
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="3" Style="min-height: 26rem;">
+                                    <div class="hr-placeholder-icon">
+                                        <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Size="Size.Large" Style="font-size: 3rem; color: #44abdf;" />
+                                    </div>
+                                    <MudText Class="hr-section-kicker">In Progress</MudText>
+                                    <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; letter-spacing: -0.04em;">
+                                        @_activeForm
+                                    </MudText>
+                                    <MudText Typo="Typo.body1" Align="Align.Center" Style="max-width: 32rem; color: #64748b;">
+                                        This workspace is ready for the dynamic CRUD pattern and can be connected to a dedicated DTO set whenever the next phase starts.
+                                    </MudText>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="rounded-pill px-6" Style="text-transform: none;" OnClick="HandleToolbarClose">
+                                        Close
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                            break;
+                    }
+                </MudStack>
             }
         </MudItem>
     </MudGrid>
