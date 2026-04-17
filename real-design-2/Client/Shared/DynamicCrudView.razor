@@ -3,25 +3,7 @@
 <MudStack Spacing="3" Class="dynamic-crud-view">
     <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Class="mb-4">
-            <MudStack Spacing="1">
-                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                    @if (ShowBackButton)
-                    {
-                        <MudIconButton
-                            Icon="@Icons.Material.Filled.ArrowBack"
-                            Color="Color.Default"
-                            Class="d-md-none"
-                            OnClick="OnBack" />
-                    }
-
-                    <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
-                </MudStack>
-
-                @if (!string.IsNullOrWhiteSpace(Description))
-                {
-                    <MudText Typo="Typo.body2" Class="dynamic-crud-view__description">@Description</MudText>
-                }
-            </MudStack>
+            <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
 
             @if (!string.IsNullOrWhiteSpace(BadgeText))
             {
@@ -75,9 +57,6 @@
     public string Title { get; set; } = string.Empty;
 
     [Parameter]
-    public string Description { get; set; } = string.Empty;
-
-    [Parameter]
     public string BadgeText { get; set; } = string.Empty;
 
     [Parameter]
@@ -107,9 +86,4 @@
     [Parameter]
     public EventCallback<MouseEventArgs> OnClose { get; set; }
 
-    [Parameter]
-    public EventCallback<MouseEventArgs> OnBack { get; set; }
-
-    [Parameter]
-    public bool ShowBackButton { get; set; }
 }

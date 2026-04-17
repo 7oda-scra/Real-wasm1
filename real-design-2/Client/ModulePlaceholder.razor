@@ -1,10 +1,11 @@
-<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column align-center justify-center text-center mt-16 pt-16">
-    <MudIcon Icon="@Icon" Style="font-size: 5rem; color: #9ca3af; margin-bottom: 2.5rem;" />
-    <MudText Typo="Typo.h3" Style="font-weight: 700; color: #1f2937; letter-spacing: -1px; margin-bottom: 2.5rem;">@Title</MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-pill px-8 py-3" Style="font-weight: 600; font-size: 1.1rem; text-transform: none; box-shadow: 0 4px 14px 0 rgba(68, 171, 223, 0.39);" OnClick='() => NavigationManager.NavigateTo("/")'>
-        Back to Dashboard
-    </MudButton>
-</MudContainer>
+<PageContainer Title="@Title">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column align-center justify-center text-center pt-8 pb-6">
+        <MudIcon Icon="@Icon" Style="font-size: 5rem; color: #9ca3af; margin-bottom: 2.5rem;" />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="rounded-pill px-8 py-3" Style="font-weight: 600; font-size: 1.1rem; text-transform: none; box-shadow: 0 4px 14px 0 rgba(68, 171, 223, 0.39);" OnClick='() => NavigationManager.NavigateTo("/")'>
+            Back to Dashboard
+        </MudButton>
+    </MudContainer>
+</PageContainer>
 
 @code {
     [Parameter]

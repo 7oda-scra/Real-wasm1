@@ -1,0 +1,23 @@
+<section class="page-container">
+    <div class="page-container__content">
+        <MudStack Spacing="4">
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <MudText Typo="Typo.h4" Class="page-container__title">@Title</MudText>
+            }
+
+            @if (ChildContent is not null)
+            {
+                @ChildContent
+            }
+        </MudStack>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

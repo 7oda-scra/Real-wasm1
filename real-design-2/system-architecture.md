@@ -72,3 +72,10 @@ A high-end, responsive Blazor Server/WebApp ERP system driven by `MudBlazor` UI 
 - **Drill-Down HR Flow**: `Hr.razor` now enforces a mobile-first drill-down interaction. On phones, the left navigation menu becomes a dedicated first screen and the active CRUD surface becomes a dedicated second screen with a prominent “Back to Menu” action.
 - **Table Safety Rails**: `DynamicCrudView.razor` standardizes `MudTable` with horizontal scrolling to prevent column-rich grids from blowing out the viewport on narrow screens.
 - **Responsive Spacing System**: Shared responsive padding utilities now scale shell, card, and form spacing down on handheld screens and restore generous white space on tablet and desktop layouts.
+
+## Phase 11: Web-Responsive Centralization
+- **Central Page Wrapper (`PageContainer.razor`)**: Introduced a shared page-shell component that standardizes responsive page padding and top-level headers. `Home.razor`, `Hr.razor`, and `ModulePlaceholder.razor` now flow through this wrapper so future spacing and title changes can be made once and propagate globally.
+- **Fluid Grid Strategy**: Replaced brittle view-hiding behavior in `Hr.razor` with standard `MudGrid` breakpoints. The navigation rail now uses `xs="12" md="3" lg="2"` and the working surface uses `xs="12" md="9" lg="10"`, allowing the layout to stack naturally on smaller screens and sit side-by-side on wider ones.
+- **Minimalist Content Density**: Removed descriptive subtext from the dashboard cards, HR surface headers, and placeholder shells so module screens present a cleaner, more compact visual hierarchy.
+- **Shared CRUD Surface Simplification**: `DynamicCrudView.razor` now centralizes a leaner title-plus-badge header and keeps horizontal table scrolling in place, while avoiding page-specific explanatory copy.
+- **App Shell Stabilization**: Restored the application shell to a solid primary `MudAppBar` with a responsive `MudDrawer` that remains part of the web layout across breakpoints instead of relying on drill-down-only navigation behavior.
