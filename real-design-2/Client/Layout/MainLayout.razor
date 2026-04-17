@@ -11,9 +11,9 @@
 <MudBreakpointProvider OnBreakpointChanged="HandleBreakpointChanged" />
 
 <MudLayout>
-    <MudAppBar Color="Color.Primary" Elevation="4" Class="app-shell__appbar">
+    <MudAppBar Color="Color.Surface" Elevation="1" Class="app-shell__appbar">
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="app-shell__brand">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" Class="app-shell__menu-trigger" OnClick="ToggleDrawer" />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Default" Edge="Edge.Start" Class="app-shell__menu-trigger" OnClick="ToggleDrawer" />
             <img src="assets/main-logo.png" alt="Smart Code Logo" class="app-shell__logo" />
         </MudStack>
         <MudSpacer />
@@ -48,10 +48,8 @@
         <NavMenu />
     </MudDrawer>
 
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="app-shell__body-container">
-            @Body
-        </MudContainer>
+    <MudMainContent Class="app-shell__main-content">
+        @Body
     </MudMainContent>
 </MudLayout>
 

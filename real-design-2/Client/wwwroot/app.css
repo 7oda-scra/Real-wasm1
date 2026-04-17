@@ -44,7 +44,11 @@ a,
 
 .app-shell__appbar {
     padding: 0.55rem 0.9rem;
-    color: #ffffff;
+    color: #1f2937;
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .app-shell__brand {
@@ -64,7 +68,7 @@ a,
 .app-shell__avatar {
     cursor: pointer;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.75);
 }
 
 .app-shell__drawer {
@@ -73,10 +77,9 @@ a,
         linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
 }
 
-.app-shell__body-container {
+.app-shell__main-content {
     margin-top: 1rem;
     margin-bottom: 1.75rem;
-    padding-top: 0.75rem;
 }
 
 .page-container__content {
@@ -320,10 +323,9 @@ a,
         max-height: 32px;
     }
 
-    .app-shell__body-container {
+    .app-shell__main-content {
         margin-top: 0.35rem;
         margin-bottom: 1rem;
-        padding-top: 0.35rem;
     }
 
     .page-container__content {
