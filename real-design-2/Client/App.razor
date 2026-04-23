@@ -1,8 +1,14 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using RealDesign2.Client.Layout
+@using RealDesign2.Client.Theme
 @using MudBlazor
 
 <CascadingAuthenticationState>
+    <MudThemeProvider Theme="@AppTheme.Default" />
+    <MudPopoverProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+
     <ErrorBoundary>
         <ChildContent>
             <Router AppAssembly="@typeof(Program).Assembly">

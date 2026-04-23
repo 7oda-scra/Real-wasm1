@@ -1,16 +1,11 @@
 @inherits LayoutComponentBase
 @implements IDisposable
-@using RealDesign2.Client.Theme
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<MudThemeProvider Theme="@AppTheme.Default" />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
-<MudBreakpointProvider OnBreakpointChanged="HandleBreakpointChanged" />
-
 <MudLayout Class="app-shell__layout">
+    <MudBreakpointProvider OnBreakpointChanged="HandleBreakpointChanged" />
+
     <MudAppBar Color="Color.Surface" Elevation="1" Class="app-shell__appbar">
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="app-shell__brand">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Default" Edge="Edge.Start" Class="app-shell__menu-trigger" OnClick="ToggleDrawer" />

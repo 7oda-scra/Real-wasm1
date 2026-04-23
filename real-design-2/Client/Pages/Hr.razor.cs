@@ -133,7 +133,7 @@ public partial class Hr : ComponentBase
         ResetAllDrafts();
     }
 
-    private IReadOnlyList<BreadcrumbItem> BuildBreadcrumbs()
+    private List<BreadcrumbItem> BuildBreadcrumbs()
     {
         var items = new List<BreadcrumbItem>
         {
