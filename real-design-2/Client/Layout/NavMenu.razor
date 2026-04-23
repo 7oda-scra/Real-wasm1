@@ -2,8 +2,8 @@
 @inject IModuleService ModuleService
 @inject IAuthService AuthService
 
-<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+<MudNavMenu Class="app-nav-menu">
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home" Class="app-nav-menu__link">Home</MudNavLink>
 
     @if (_isLoading)
     {
@@ -11,10 +11,10 @@
     }
     else if (_allowedModules.Count > 0)
     {
-        <MudNavGroup Title="Modules" Expanded="true" Icon="@Icons.Material.Filled.Apps">
+        <MudNavGroup Title="Modules" Expanded="true" Icon="@Icons.Material.Filled.Apps" Class="app-nav-menu__group">
             @foreach (var module in _allowedModules)
             {
-                <MudNavLink Href="@module.Route" Match="NavLinkMatch.All" Icon="@module.IconPath">@module.Name</MudNavLink>
+                <MudNavLink Href="@module.Route" Match="NavLinkMatch.All" Icon="@module.IconPath" Class="app-nav-menu__child-link">@module.Name</MudNavLink>
             }
         </MudNavGroup>
     }

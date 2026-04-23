@@ -10,7 +10,7 @@
 <MudSnackbarProvider />
 <MudBreakpointProvider OnBreakpointChanged="HandleBreakpointChanged" />
 
-<MudLayout>
+<MudLayout Class="app-shell__layout">
     <MudAppBar Color="Color.Surface" Elevation="1" Class="app-shell__appbar">
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="app-shell__brand">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Default" Edge="Edge.Start" Class="app-shell__menu-trigger" OnClick="ToggleDrawer" />

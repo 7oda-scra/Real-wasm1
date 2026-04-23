@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using RealDesign2.Client.Services;
@@ -46,6 +45,7 @@ public partial class Hr : ComponentBase
     ];
 
     private string _activeForm = HrViewKeys.Sectors;
+    private bool _isDetailPanelOpen;
 
     private List<Sector> _sectors = [];
     private List<Department> _departments = [];
@@ -70,6 +70,18 @@ public partial class Hr : ComponentBase
     private BaseDto _salaryItemDraft = new();
     private BaseDto _overtimeSettingDraft = new();
     private BaseDto _salaryCalculationRuleDraft = new();
+
+    private Sector? _selectedSector;
+    private Department? _selectedDepartment;
+    private Section? _selectedSection;
+    private Job? _selectedJob;
+    private Qualification? _selectedQualification;
+    private EmployeeRecord? _selectedEmployee;
+    private AttendanceSystem? _selectedAttendanceSystem;
+    private Shift? _selectedShift;
+    private BaseDto? _selectedSalaryItem;
+    private BaseDto? _selectedOvertimeSetting;
+    private BaseDto? _selectedSalaryCalculationRule;
 
     protected override void OnInitialized()
     {
@@ -121,32 +133,60 @@ public partial class Hr : ComponentBase
         ResetAllDrafts();
     }
 
-    private string GetActiveCss(string formName)
+    private IReadOnlyList<BreadcrumbItem> BuildBreadcrumbs()
     {
-        return _activeForm == formName ? "mud-nav-link-active" : string.Empty;
+        var items = new List<BreadcrumbItem>
+        {
+            new("Home", "/"),
+            new("Human Resources", "/hr")
+        };
+
+        var activeSection = GetActiveSection();
+        if (activeSection is not null)
+        {
+            items.Add(new BreadcrumbItem(activeSection.Title, href: null, disabled: true));
+        }
+
+        var activeLabel = GetActiveFormLabel();
+        if (!string.IsNullOrWhiteSpace(activeLabel))
+        {
+            items.Add(new BreadcrumbItem(activeLabel, href: null, disabled: true));
+        }
+
+        return items;
+    }
+
+    private string GetNavLinkCss(string formName)
+    {
+        return _activeForm == formName
+            ? "hr-nav-menu__link mud-nav-link-active"
+            : "hr-nav-menu__link";
     }
 
     private void SetActiveForm(string formName)
     {
         _activeForm = formName;
         LoadDraftForActiveForm();
-    }
-
-    private void CloseForm()
-    {
-        _activeForm = string.Empty;
+        _isDetailPanelOpen = false;
     }
 
     private void HandleAdd(MouseEventArgs _)
     {
+        ClearActiveSelection();
         ResetDraftForActiveForm();
-        Snackbar.Add($"{_activeForm} is ready for a new entry.", Severity.Info);
+        _isDetailPanelOpen = true;
+        Snackbar.Add($"{GetActiveFormLabel()} is ready for a new entry.", Severity.Info);
     }
 
     private void HandleModify(MouseEventArgs _)
     {
-        LoadDraftForActiveForm();
-        Snackbar.Add($"{_activeForm} sample loaded into the form.", Severity.Normal);
+        if (!TryOpenCurrentSelection())
+        {
+            Snackbar.Add($"Select a {GetActiveFormLabel().ToLowerInvariant()} row before modifying.", Severity.Warning);
+            return;
+        }
+
+        Snackbar.Add($"{GetActiveFormLabel()} loaded into the detail panel.", Severity.Normal);
     }
 
     private void HandleDelete(MouseEventArgs _)
@@ -154,24 +194,19 @@ public partial class Hr : ComponentBase
         switch (_activeForm)
         {
             case HrViewKeys.Sectors:
-                DeleteBasicItem(_sectors, _sectorDraft);
-                ResetBasicDraft(_sectors, value => _sectorDraft = value);
+                DeleteBasicItem(_sectors, _sectorDraft, value => _selectedSector = value, value => _sectorDraft = value);
                 break;
             case HrViewKeys.Departments:
-                DeleteBasicItem(_departments, _departmentDraft);
-                ResetBasicDraft(_departments, value => _departmentDraft = value);
+                DeleteBasicItem(_departments, _departmentDraft, value => _selectedDepartment = value, value => _departmentDraft = value);
                 break;
             case HrViewKeys.Sections:
-                DeleteBasicItem(_sections, _sectionDraft);
-                ResetBasicDraft(_sections, value => _sectionDraft = value);
+                DeleteBasicItem(_sections, _sectionDraft, value => _selectedSection = value, value => _sectionDraft = value);
                 break;
             case HrViewKeys.Jobs:
-                DeleteBasicItem(_jobs, _jobDraft);
-                ResetBasicDraft(_jobs, value => _jobDraft = value);
+                DeleteBasicItem(_jobs, _jobDraft, value => _selectedJob = value, value => _jobDraft = value);
                 break;
             case HrViewKeys.Qualifications:
-                DeleteBasicItem(_qualifications, _qualificationDraft);
-                ResetBasicDraft(_qualifications, value => _qualificationDraft = value);
+                DeleteBasicItem(_qualifications, _qualificationDraft, value => _selectedQualification = value, value => _qualificationDraft = value);
                 break;
             case HrViewKeys.Employees:
                 DeleteEmployee();
@@ -183,16 +218,13 @@ public partial class Hr : ComponentBase
                 DeleteShift();
                 break;
             case HrViewKeys.SalaryItems:
-                DeleteBasicItem(_salaryItems, _salaryItemDraft);
-                ResetBasicDraft(_salaryItems, value => _salaryItemDraft = value);
+                DeleteBasicItem(_salaryItems, _salaryItemDraft, value => _selectedSalaryItem = value, value => _salaryItemDraft = value);
                 break;
             case HrViewKeys.OvertimeSettings:
-                DeleteBasicItem(_overtimeSettings, _overtimeSettingDraft);
-                ResetBasicDraft(_overtimeSettings, value => _overtimeSettingDraft = value);
+                DeleteBasicItem(_overtimeSettings, _overtimeSettingDraft, value => _selectedOvertimeSetting = value, value => _overtimeSettingDraft = value);
                 break;
             case HrViewKeys.SalaryCalculationRules:
-                DeleteBasicItem(_salaryCalculationRules, _salaryCalculationRuleDraft);
-                ResetBasicDraft(_salaryCalculationRules, value => _salaryCalculationRuleDraft = value);
+                DeleteBasicItem(_salaryCalculationRules, _salaryCalculationRuleDraft, value => _selectedSalaryCalculationRule = value, value => _salaryCalculationRuleDraft = value);
                 break;
         }
     }
@@ -202,19 +234,19 @@ public partial class Hr : ComponentBase
         switch (_activeForm)
         {
             case HrViewKeys.Sectors:
-                SaveBasicItem(_sectors, _sectorDraft, value => _sectorDraft = value);
+                SaveBasicItem(_sectors, _sectorDraft, value => _sectorDraft = value, value => _selectedSector = value);
                 break;
             case HrViewKeys.Departments:
-                SaveBasicItem(_departments, _departmentDraft, value => _departmentDraft = value);
+                SaveBasicItem(_departments, _departmentDraft, value => _departmentDraft = value, value => _selectedDepartment = value);
                 break;
             case HrViewKeys.Sections:
-                SaveBasicItem(_sections, _sectionDraft, value => _sectionDraft = value);
+                SaveBasicItem(_sections, _sectionDraft, value => _sectionDraft = value, value => _selectedSection = value);
                 break;
             case HrViewKeys.Jobs:
-                SaveBasicItem(_jobs, _jobDraft, value => _jobDraft = value);
+                SaveBasicItem(_jobs, _jobDraft, value => _jobDraft = value, value => _selectedJob = value);
                 break;
             case HrViewKeys.Qualifications:
-                SaveBasicItem(_qualifications, _qualificationDraft, value => _qualificationDraft = value);
+                SaveBasicItem(_qualifications, _qualificationDraft, value => _qualificationDraft = value, value => _selectedQualification = value);
                 break;
             case HrViewKeys.Employees:
                 SaveEmployee();
@@ -226,35 +258,35 @@ public partial class Hr : ComponentBase
                 SaveShift();
                 break;
             case HrViewKeys.SalaryItems:
-                SaveBasicItem(_salaryItems, _salaryItemDraft, value => _salaryItemDraft = value);
+                SaveBasicItem(_salaryItems, _salaryItemDraft, value => _salaryItemDraft = value, value => _selectedSalaryItem = value);
                 break;
             case HrViewKeys.OvertimeSettings:
-                SaveBasicItem(_overtimeSettings, _overtimeSettingDraft, value => _overtimeSettingDraft = value);
+                SaveBasicItem(_overtimeSettings, _overtimeSettingDraft, value => _overtimeSettingDraft = value, value => _selectedOvertimeSetting = value);
                 break;
             case HrViewKeys.SalaryCalculationRules:
-                SaveBasicItem(_salaryCalculationRules, _salaryCalculationRuleDraft, value => _salaryCalculationRuleDraft = value);
+                SaveBasicItem(_salaryCalculationRules, _salaryCalculationRuleDraft, value => _salaryCalculationRuleDraft = value, value => _selectedSalaryCalculationRule = value);
                 break;
         }
     }
 
     private void HandleToolbarClose(MouseEventArgs _)
     {
-        CloseForm();
+        _isDetailPanelOpen = false;
     }
 
     private void ResetAllDrafts()
     {
-        ResetBasicDraft(_sectors, value => _sectorDraft = value);
-        ResetBasicDraft(_departments, value => _departmentDraft = value);
-        ResetBasicDraft(_sections, value => _sectionDraft = value);
-        ResetBasicDraft(_jobs, value => _jobDraft = value);
-        ResetBasicDraft(_qualifications, value => _qualificationDraft = value);
-        _employeeDraft = _employees.Count > 0 ? CloneEmployee(_employees[0]) : new EmployeeRecord();
-        _attendanceSystemDraft = _attendanceSystems.Count > 0 ? CloneAttendanceSystem(_attendanceSystems[0]) : new AttendanceSystem();
-        _shiftDraft = _shifts.Count > 0 ? CloneShift(_shifts[0]) : new Shift();
-        ResetBasicDraft(_salaryItems, value => _salaryItemDraft = value);
-        ResetBasicDraft(_overtimeSettings, value => _overtimeSettingDraft = value);
-        ResetBasicDraft(_salaryCalculationRules, value => _salaryCalculationRuleDraft = value);
+        _sectorDraft = new Sector();
+        _departmentDraft = new Department();
+        _sectionDraft = new Section();
+        _jobDraft = new Job();
+        _qualificationDraft = new Qualification();
+        _employeeDraft = new EmployeeRecord();
+        _attendanceSystemDraft = new AttendanceSystem();
+        _shiftDraft = new Shift();
+        _salaryItemDraft = new BaseDto();
+        _overtimeSettingDraft = new BaseDto();
+        _salaryCalculationRuleDraft = new BaseDto();
     }
 
     private void LoadDraftForActiveForm()
@@ -262,37 +294,37 @@ public partial class Hr : ComponentBase
         switch (_activeForm)
         {
             case HrViewKeys.Sectors:
-                ResetBasicDraft(_sectors, value => _sectorDraft = value);
+                _sectorDraft = _selectedSector is not null ? CloneBaseDto(_selectedSector) : new Sector();
                 break;
             case HrViewKeys.Departments:
-                ResetBasicDraft(_departments, value => _departmentDraft = value);
+                _departmentDraft = _selectedDepartment is not null ? CloneBaseDto(_selectedDepartment) : new Department();
                 break;
             case HrViewKeys.Sections:
-                ResetBasicDraft(_sections, value => _sectionDraft = value);
+                _sectionDraft = _selectedSection is not null ? CloneBaseDto(_selectedSection) : new Section();
                 break;
             case HrViewKeys.Jobs:
-                ResetBasicDraft(_jobs, value => _jobDraft = value);
+                _jobDraft = _selectedJob is not null ? CloneBaseDto(_selectedJob) : new Job();
                 break;
             case HrViewKeys.Qualifications:
-                ResetBasicDraft(_qualifications, value => _qualificationDraft = value);
+                _qualificationDraft = _selectedQualification is not null ? CloneBaseDto(_selectedQualification) : new Qualification();
                 break;
             case HrViewKeys.Employees:
-                _employeeDraft = _employees.Count > 0 ? CloneEmployee(_employees[0]) : new EmployeeRecord();
+                _employeeDraft = _selectedEmployee is not null ? CloneEmployee(_selectedEmployee) : new EmployeeRecord();
                 break;
             case HrViewKeys.AttendanceSystems:
-                _attendanceSystemDraft = _attendanceSystems.Count > 0 ? CloneAttendanceSystem(_attendanceSystems[0]) : new AttendanceSystem();
+                _attendanceSystemDraft = _selectedAttendanceSystem is not null ? CloneAttendanceSystem(_selectedAttendanceSystem) : new AttendanceSystem();
                 break;
             case HrViewKeys.Shifts:
-                _shiftDraft = _shifts.Count > 0 ? CloneShift(_shifts[0]) : new Shift();
+                _shiftDraft = _selectedShift is not null ? CloneShift(_selectedShift) : new Shift();
                 break;
             case HrViewKeys.SalaryItems:
-                ResetBasicDraft(_salaryItems, value => _salaryItemDraft = value);
+                _salaryItemDraft = _selectedSalaryItem is not null ? CloneBaseDto(_selectedSalaryItem) : new BaseDto();
                 break;
             case HrViewKeys.OvertimeSettings:
-                ResetBasicDraft(_overtimeSettings, value => _overtimeSettingDraft = value);
+                _overtimeSettingDraft = _selectedOvertimeSetting is not null ? CloneBaseDto(_selectedOvertimeSetting) : new BaseDto();
                 break;
             case HrViewKeys.SalaryCalculationRules:
-                ResetBasicDraft(_salaryCalculationRules, value => _salaryCalculationRuleDraft = value);
+                _salaryCalculationRuleDraft = _selectedSalaryCalculationRule is not null ? CloneBaseDto(_selectedSalaryCalculationRule) : new BaseDto();
                 break;
         }
     }
@@ -337,7 +369,96 @@ public partial class Hr : ComponentBase
         }
     }
 
-    private void SaveBasicItem<T>(List<T> items, T draft, Action<T> setDraft)
+    private void ClearActiveSelection()
+    {
+        switch (_activeForm)
+        {
+            case HrViewKeys.Sectors:
+                _selectedSector = null;
+                break;
+            case HrViewKeys.Departments:
+                _selectedDepartment = null;
+                break;
+            case HrViewKeys.Sections:
+                _selectedSection = null;
+                break;
+            case HrViewKeys.Jobs:
+                _selectedJob = null;
+                break;
+            case HrViewKeys.Qualifications:
+                _selectedQualification = null;
+                break;
+            case HrViewKeys.Employees:
+                _selectedEmployee = null;
+                break;
+            case HrViewKeys.AttendanceSystems:
+                _selectedAttendanceSystem = null;
+                break;
+            case HrViewKeys.Shifts:
+                _selectedShift = null;
+                break;
+            case HrViewKeys.SalaryItems:
+                _selectedSalaryItem = null;
+                break;
+            case HrViewKeys.OvertimeSettings:
+                _selectedOvertimeSetting = null;
+                break;
+            case HrViewKeys.SalaryCalculationRules:
+                _selectedSalaryCalculationRule = null;
+                break;
+        }
+    }
+
+    private bool TryOpenCurrentSelection()
+    {
+        switch (_activeForm)
+        {
+            case HrViewKeys.Sectors:
+                return TryOpenSelection(_selectedSector, _sectors, SelectSector);
+            case HrViewKeys.Departments:
+                return TryOpenSelection(_selectedDepartment, _departments, SelectDepartment);
+            case HrViewKeys.Sections:
+                return TryOpenSelection(_selectedSection, _sections, SelectSection);
+            case HrViewKeys.Jobs:
+                return TryOpenSelection(_selectedJob, _jobs, SelectJob);
+            case HrViewKeys.Qualifications:
+                return TryOpenSelection(_selectedQualification, _qualifications, SelectQualification);
+            case HrViewKeys.Employees:
+                return TryOpenSelection(_selectedEmployee, _employees, SelectEmployee);
+            case HrViewKeys.AttendanceSystems:
+                return TryOpenSelection(_selectedAttendanceSystem, _attendanceSystems, SelectAttendanceSystem);
+            case HrViewKeys.Shifts:
+                return TryOpenSelection(_selectedShift, _shifts, SelectShift);
+            case HrViewKeys.SalaryItems:
+                return TryOpenSelection(_selectedSalaryItem, _salaryItems, SelectSalaryItem);
+            case HrViewKeys.OvertimeSettings:
+                return TryOpenSelection(_selectedOvertimeSetting, _overtimeSettings, SelectOvertimeSetting);
+            case HrViewKeys.SalaryCalculationRules:
+                return TryOpenSelection(_selectedSalaryCalculationRule, _salaryCalculationRules, SelectSalaryCalculationRule);
+            default:
+                return false;
+        }
+    }
+
+    private static bool TryOpenSelection<T>(T? selected, List<T> items, Action<T?> select)
+        where T : class
+    {
+        if (selected is not null)
+        {
+            select(selected);
+            return true;
+        }
+
+        if (items.Count == 0)
+        {
+            return false;
+        }
+
+        select(items[0]);
+        return true;
+    }
+
+    private void SaveBasicItem<T>(List<T> items, T draft, Action<T> setDraft, Action<T?> setSelected)
         where T : BaseDto, new()
     {
         if (string.IsNullOrWhiteSpace(draft.Id) || string.IsNullOrWhiteSpace(draft.Name))
@@ -347,21 +468,27 @@ public partial class Hr : ComponentBase
         }
 
         var existing = items.FirstOrDefault(item => item.Id.Equals(draft.Id, StringComparison.OrdinalIgnoreCase));
+        T target;
+
         if (existing is null)
         {
-            items.Add(CloneBaseDto(draft));
-            Snackbar.Add($"{_activeForm} entry added.", Severity.Success);
+            target = CloneBaseDto(draft);
+            items.Add(target);
+            Snackbar.Add($"{GetActiveFormLabel()} entry added.", Severity.Success);
         }
         else
         {
             existing.Name = draft.Name;
-            Snackbar.Add($"{_activeForm} entry updated.", Severity.Success);
+            target = existing;
+            Snackbar.Add($"{GetActiveFormLabel()} entry updated.", Severity.Success);
         }
 
-        setDraft(CloneBaseDto(draft));
+        setSelected(target);
+        setDraft(CloneBaseDto(target));
+        _isDetailPanelOpen = true;
     }
 
-    private void DeleteBasicItem<T>(List<T> items, T draft)
+    private void DeleteBasicItem<T>(List<T> items, T draft, Action<T?> setSelected, Action<T> setDraft)
         where T : BaseDto, new()
     {
         if (string.IsNullOrWhiteSpace(draft.Id))
@@ -372,14 +499,15 @@ public partial class Hr : ComponentBase
 
         var removedCount = items.RemoveAll(item => item.Id.Equals(draft.Id, StringComparison.OrdinalIgnoreCase));
         Snackbar.Add(
-            removedCount > 0 ? $"{_activeForm} entry deleted." : "No matching entry was found.",
+            removedCount > 0 ? $"{GetActiveFormLabel()} entry deleted." : "No matching entry was found.",
             removedCount > 0 ? Severity.Success : Severity.Info);
-    }
 
-    private void ResetBasicDraft<T>(List<T> items, Action<T> setDraft)
-        where T : BaseDto, new()
-    {
-        setDraft(items.Count > 0 ? CloneBaseDto(items[0]) : new T());
+        if (removedCount > 0)
+        {
+            setSelected(null);
+            setDraft(new T());
+            _isDetailPanelOpen = false;
+        }
     }
 
     private void SaveEmployee()
@@ -393,9 +521,12 @@ public partial class Hr : ComponentBase
         }
 
         var existing = _employees.FirstOrDefault(item => item.Id.Equals(_employeeDraft.Id, StringComparison.OrdinalIgnoreCase));
+        EmployeeRecord target;
+
         if (existing is null)
         {
-            _employees.Add(CloneEmployee(_employeeDraft));
+            target = CloneEmployee(_employeeDraft);
+            _employees.Add(target);
             Snackbar.Add("Employee added to the directory.", Severity.Success);
         }
         else
@@ -404,15 +535,20 @@ public partial class Hr : ComponentBase
             existing.Title = _employeeDraft.Title;
             existing.Email = _employeeDraft.Email;
             existing.Department = _employeeDraft.Department;
+            target = existing;
             Snackbar.Add("Employee record updated.", Severity.Success);
         }
+
+        _selectedEmployee = target;
+        _employeeDraft = CloneEmployee(target);
+        _isDetailPanelOpen = true;
     }
 
     private void DeleteEmployee()
     {
         if (string.IsNullOrWhiteSpace(_employeeDraft.Id))
         {
-            Snackbar.Add("Enter an employee ID before deleting.", Severity.Warning);
+            Snackbar.Add("Select an employee before deleting.", Severity.Warning);
             return;
         }
 
@@ -421,7 +557,12 @@ public partial class Hr : ComponentBase
             removedCount > 0 ? "Employee removed from the directory." : "No employee matched that ID.",
             removedCount > 0 ? Severity.Success : Severity.Info);
 
-        _employeeDraft = _employees.Count > 0 ? CloneEmployee(_employees[0]) : new EmployeeRecord();
+        if (removedCount > 0)
+        {
+            _selectedEmployee = null;
+            _employeeDraft = new EmployeeRecord();
+            _isDetailPanelOpen = false;
+        }
     }
 
     private void SaveAttendanceSystem()
@@ -433,24 +574,32 @@ public partial class Hr : ComponentBase
         }
 
         var existing = _attendanceSystems.FirstOrDefault(item => item.Id.Equals(_attendanceSystemDraft.Id, StringComparison.OrdinalIgnoreCase));
+        AttendanceSystem target;
+
         if (existing is null)
         {
-            _attendanceSystems.Add(CloneAttendanceSystem(_attendanceSystemDraft));
+            target = CloneAttendanceSystem(_attendanceSystemDraft);
+            _attendanceSystems.Add(target);
             Snackbar.Add("Attendance system added.", Severity.Success);
         }
         else
         {
             existing.Name = _attendanceSystemDraft.Name;
             existing.TrackingType = _attendanceSystemDraft.TrackingType;
+            target = existing;
             Snackbar.Add("Attendance system updated.", Severity.Success);
         }
+
+        _selectedAttendanceSystem = target;
+        _attendanceSystemDraft = CloneAttendanceSystem(target);
+        _isDetailPanelOpen = true;
     }
 
     private void DeleteAttendanceSystem()
     {
         if (string.IsNullOrWhiteSpace(_attendanceSystemDraft.Id))
         {
-            Snackbar.Add("Enter an attendance system ID before deleting.", Severity.Warning);
+            Snackbar.Add("Select an attendance system before deleting.", Severity.Warning);
             return;
         }
 
@@ -459,7 +608,12 @@ public partial class Hr : ComponentBase
             removedCount > 0 ? "Attendance system deleted." : "No attendance system matched that ID.",
             removedCount > 0 ? Severity.Success : Severity.Info);
 
-        _attendanceSystemDraft = _attendanceSystems.Count > 0 ? CloneAttendanceSystem(_attendanceSystems[0]) : new AttendanceSystem();
+        if (removedCount > 0)
+        {
+            _selectedAttendanceSystem = null;
+            _attendanceSystemDraft = new AttendanceSystem();
+            _isDetailPanelOpen = false;
+        }
     }
 
     private void SaveShift()
@@ -473,9 +627,12 @@ public partial class Hr : ComponentBase
         }
 
         var existing = _shifts.FirstOrDefault(item => item.Id.Equals(_shiftDraft.Id, StringComparison.OrdinalIgnoreCase));
+        Shift target;
+
         if (existing is null)
         {
-            _shifts.Add(CloneShift(_shiftDraft));
+            target = CloneShift(_shiftDraft);
+            _shifts.Add(target);
             Snackbar.Add("Shift added.", Severity.Success);
         }
         else
@@ -486,15 +643,20 @@ public partial class Hr : ComponentBase
             existing.EndTime = _shiftDraft.EndTime;
             existing.WorkingHours = _shiftDraft.WorkingHours;
             existing.ClosesNextDay = _shiftDraft.ClosesNextDay;
+            target = existing;
             Snackbar.Add("Shift updated.", Severity.Success);
         }
+
+        _selectedShift = target;
+        _shiftDraft = CloneShift(target);
+        _isDetailPanelOpen = true;
     }
 
     private void DeleteShift()
     {
         if (string.IsNullOrWhiteSpace(_shiftDraft.Id))
         {
-            Snackbar.Add("Enter a shift ID before deleting.", Severity.Warning);
+            Snackbar.Add("Select a shift before deleting.", Severity.Warning);
             return;
         }
 
@@ -503,7 +665,94 @@ public partial class Hr : ComponentBase
             removedCount > 0 ? "Shift deleted." : "No shift matched that ID.",
             removedCount > 0 ? Severity.Success : Severity.Info);
 
-        _shiftDraft = _shifts.Count > 0 ? CloneShift(_shifts[0]) : new Shift();
+        if (removedCount > 0)
+        {
+            _selectedShift = null;
+            _shiftDraft = new Shift();
+            _isDetailPanelOpen = false;
+        }
+    }
+
+    private void SelectSector(Sector? item)
+    {
+        SetBasicSelection(item, value => _selectedSector = value, value => _sectorDraft = value);
+    }
+
+    private void SelectDepartment(Department? item)
+    {
+        SetBasicSelection(item, value => _selectedDepartment = value, value => _departmentDraft = value);
+    }
+
+    private void SelectSection(Section? item)
+    {
+        SetBasicSelection(item, value => _selectedSection = value, value => _sectionDraft = value);
+    }
+
+    private void SelectJob(Job? item)
+    {
+        SetBasicSelection(item, value => _selectedJob = value, value => _jobDraft = value);
+    }
+
+    private void SelectQualification(Qualification? item)
+    {
+        SetBasicSelection(item, value => _selectedQualification = value, value => _qualificationDraft = value);
+    }
+
+    private void SelectSalaryItem(BaseDto? item)
+    {
+        SetBasicSelection(item, value => _selectedSalaryItem = value, value => _salaryItemDraft = value);
+    }
+
+    private void SelectOvertimeSetting(BaseDto? item)
+    {
+        SetBasicSelection(item, value => _selectedOvertimeSetting = value, value => _overtimeSettingDraft = value);
+    }
+
+    private void SelectSalaryCalculationRule(BaseDto? item)
+    {
+        SetBasicSelection(item, value => _selectedSalaryCalculationRule = value, value => _salaryCalculationRuleDraft = value);
+    }
+
+    private void SelectEmployee(EmployeeRecord? item)
+    {
+        _selectedEmployee = item;
+        _employeeDraft = item is not null ? CloneEmployee(item) : new EmployeeRecord();
+        _isDetailPanelOpen = item is not null;
+    }
+
+    private void SelectAttendanceSystem(AttendanceSystem? item)
+    {
+        _selectedAttendanceSystem = item;
+        _attendanceSystemDraft = item is not null ? CloneAttendanceSystem(item) : new AttendanceSystem();
+        _isDetailPanelOpen = item is not null;
+    }
+
+    private void SelectShift(Shift? item)
+    {
+        _selectedShift = item;
+        _shiftDraft = item is not null ? CloneShift(item) : new Shift();
+        _isDetailPanelOpen = item is not null;
+    }
+
+    private void SetBasicSelection<T>(T? item, Action<T?> setSelected, Action<T> setDraft)
+        where T : BaseDto, new()
+    {
+        setSelected(item);
+        setDraft(item is not null ? CloneBaseDto(item) : new T());
+        _isDetailPanelOpen = item is not null;
+    }
+
+    private HrNavigationSection? GetActiveSection()
+    {
+        return _navigationSections.FirstOrDefault(section => section.Items.Any(item => item.Key == _activeForm));
+    }
+
+    private string GetActiveFormLabel()
+    {
+        return _navigationSections
+            .SelectMany(section => section.Items)
+            .FirstOrDefault(item => item.Key == _activeForm)?
+            .Label ?? _activeForm;
     }
 
     private string GetTrackingTypeLabel(AttendanceTrackingType trackingType)

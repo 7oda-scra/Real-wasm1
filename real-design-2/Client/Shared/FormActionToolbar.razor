@@ -1,49 +1,85 @@
-<MudStack Row="true" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Spacing="1" Class="form-action-toolbar">
-    <MudButton
-        Variant="Variant.Outlined"
-        Color="Color.Default"
-        StartIcon="@Icons.Material.Filled.Add"
-        Class="rounded-pill form-action-toolbar__button"
-        Style="text-transform: none;"
-        OnClick="OnAdd">
-        Add
-    </MudButton>
+<MudStack Row="true" Wrap="Wrap.Wrap" Justify="@Justify" AlignItems="AlignItems.Center" Spacing="1" Class="form-action-toolbar">
+    @if (ShowAdd)
+    {
+        <MudButton
+            Variant="Variant.Outlined"
+            Color="Color.Default"
+            StartIcon="@Icons.Material.Filled.Add"
+            Class="rounded-pill form-action-toolbar__button"
+            Style="text-transform: none;"
+            Disabled="DisableAdd"
+            OnClick="OnAdd">
+            Add
+        </MudButton>
+    }
 
-    <MudButton
-        Variant="Variant.Outlined"
-        Color="Color.Default"
-        StartIcon="@Icons.Material.Filled.Edit"
-        Class="rounded-pill form-action-toolbar__button"
-        Style="text-transform: none;"
-        OnClick="OnModify">
-        Modify
-    </MudButton>
+    @if (ShowModify)
+    {
+        <MudButton
+            Variant="Variant.Outlined"
+            Color="Color.Default"
+            StartIcon="@Icons.Material.Filled.Edit"
+            Class="rounded-pill form-action-toolbar__button"
+            Style="text-transform: none;"
+            Disabled="DisableModify"
+            OnClick="OnModify">
+            Modify
+        </MudButton>
+    }
 
-    <MudButton
-        Variant="Variant.Outlined"
-        Color="Color.Error"
-        StartIcon="@Icons.Material.Filled.Delete"
-        Class="rounded-pill form-action-toolbar__button"
-        Style="text-transform: none;"
-        OnClick="OnDelete">
-        Delete
-    </MudButton>
+    @if (ShowDelete)
+    {
+        <MudButton
+            Variant="Variant.Outlined"
+            Color="Color.Error"
+            StartIcon="@Icons.Material.Filled.Delete"
+            Class="rounded-pill form-action-toolbar__button"
+            Style="text-transform: none;"
+            Disabled="DisableDelete"
+            OnClick="OnDelete">
+            Delete
+        </MudButton>
+    }
 
-    <MudButton
-        Variant="Variant.Filled"
-        Color="Color.Primary"
-        StartIcon="@Icons.Material.Filled.Save"
-        Class="rounded-pill form-action-toolbar__button form-action-toolbar__button--primary"
-        Style="text-transform: none; font-weight: 600;"
-        OnClick="OnSave">
-        Save
-    </MudButton>
+    @if (ShowSave)
+    {
+        <MudButton
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.Save"
+            Class="rounded-pill form-action-toolbar__button form-action-toolbar__button--primary"
+            Style="text-transform: none; font-weight: 600;"
+            Disabled="DisableSave"
+            OnClick="OnSave">
+            Save
+        </MudButton>
+    }
 
-    <MudIconButton
-        Icon="@Icons.Material.Filled.Close"
-        Color="Color.Default"
-        Class="form-action-toolbar__close"
-        OnClick="OnClose" />
+    @if (ShowClose)
+    {
+        @if (UseCloseIcon)
+        {
+            <MudIconButton
+                Icon="@Icons.Material.Filled.Close"
+                Color="Color.Default"
+                Class="form-action-toolbar__close"
+                Disabled="DisableClose"
+                OnClick="OnClose" />
+        }
+        else
+        {
+            <MudButton
+                Variant="Variant.Text"
+                Color="Color.Default"
+                StartIcon="@Icons.Material.Filled.Close"
+                Class="rounded-pill form-action-toolbar__button form-action-toolbar__button--secondary"
+                Style="text-transform: none; font-weight: 600;"
+                Disabled="DisableClose"
+                OnClick="OnClose">
+                Close
+            </MudButton>
+        }
+    }
 </MudStack>
 
 @code {
@@ -61,4 +97,40 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnClose { get; set; }
+
+    [Parameter]
+    public bool ShowAdd { get; set; } = true;
+
+    [Parameter]
+    public bool ShowModify { get; set; } = true;
+
+    [Parameter]
+    public bool ShowDelete { get; set; } = true;
+
+    [Parameter]
+    public bool ShowSave { get; set; } = true;
+
+    [Parameter]
+    public bool ShowClose { get; set; } = true;
+
+    [Parameter]
+    public bool UseCloseIcon { get; set; } = true;
+
+    [Parameter]
+    public Justify Justify { get; set; } = Justify.FlexEnd;
+
+    [Parameter]
+    public bool DisableAdd { get; set; }
+
+    [Parameter]
+    public bool DisableModify { get; set; }
+
+    [Parameter]
+    public bool DisableDelete { get; set; }
+
+    [Parameter]
+    public bool DisableSave { get; set; }
+
+    [Parameter]
+    public bool DisableClose { get; set; }
 }

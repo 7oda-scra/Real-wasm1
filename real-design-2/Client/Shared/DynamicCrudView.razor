@@ -1,75 +1,169 @@
 @typeparam TItem where TItem : class
 
-<MudStack Spacing="3" Class="dynamic-crud-view">
-    <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Class="mb-4">
-            <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
+<MudGrid Spacing="3" Class="dynamic-crud-view">
+    <MudItem xs="12" md="@GridColumnsMd" lg="@GridColumnsLg">
+        <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-4 dynamic-crud-view__heading">
+                <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
+            </MudStack>
 
-            @if (!string.IsNullOrWhiteSpace(BadgeText))
-            {
-                <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Class="dynamic-crud-view__chip">
-                    @BadgeText
-                </MudChip>
-            }
-        </MudStack>
+            <MudDataGrid T="TItem"
+                         Items="Items"
+                         Hover="true"
+                         Striped="true"
+                         Dense="true"
+                         Filterable="true"
+                         SortMode="SortMode.Multiple"
+                         ColumnResizeMode="ResizeMode.Column"
+                         HorizontalScrollbar="true"
+                         Breakpoint="Breakpoint.None"
+                         ReadOnly="true"
+                         SelectOnRowClick="true"
+                         SelectedItem="SelectedItem"
+                         SelectedItemChanged="HandleSelectedItemChanged"
+                         RowClick="HandleRowClick"
+                         Class="dynamic-crud-view__grid">
+                <ToolBarContent>
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar">
+                        <FormActionToolbar
+                            OnAdd="HandleAdd"
+                            OnModify="HandleModify"
+                            OnDelete="HandleDelete"
+                            ShowSave="false"
+                            ShowClose="false"
+                            DisableModify="@(SelectedItem is null)"
+                            DisableDelete="@(SelectedItem is null)"
+                            Justify="Justify.FlexStart" />
 
-        <MudTable T="TItem"
-                  Items="Items"
-                  Elevation="0"
-                  Hover="true"
-                  Dense="true"
-                  HorizontalScrollbar="true"
-                  Breakpoint="Breakpoint.None"
-                  Class="dynamic-crud-view__table">
-            <HeaderContent>
-                @HeaderContent
-            </HeaderContent>
-            <RowTemplate>
-                @if (RowTemplate is not null)
+                        @if (ToolBarEndContent is not null)
+                        {
+                            @ToolBarEndContent
+                        }
+                    </MudStack>
+                </ToolBarContent>
+
+                <Columns>
+                    @Columns
+                </Columns>
+
+                <PagerContent>
+                    <MudDataGridPager T="TItem"
+                                      PageSizeSelector="true"
+                                      PageSizeOptions="_pageSizeOptions"
+                                      InfoFormat="{first_item}-{last_item} of {all_items}" />
+                </PagerContent>
+            </MudDataGrid>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" md="@DetailColumnsMd" lg="@DetailColumnsLg">
+        <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__detail-shell responsive-surface-padding">
+            <MudStack Spacing="3" Class="dynamic-crud-view__detail-frame">
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Class="dynamic-crud-view__detail-header">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.h6" Class="dynamic-crud-view__detail-title">@DetailTitle</MudText>
+                        @if (!string.IsNullOrWhiteSpace(DetailSubtitle))
+                        {
+                            <MudText Typo="Typo.body2" Class="dynamic-crud-view__detail-subtitle">@DetailSubtitle</MudText>
+                        }
+                    </MudStack>
+
+                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                   Color="Color.Default"
+                                   Class="dynamic-crud-view__detail-close"
+                                   OnClick="OnClose" />
+                </MudStack>
+
+                @if (IsDetailOpen && DetailContent is not null)
                 {
-                    @RowTemplate(context)
+                    <div class="dynamic-crud-view__detail-body">
+                        @DetailContent
+                    </div>
                 }
-            </RowTemplate>
-        </MudTable>
-    </MudPaper>
+                else
+                {
+                    <MudPaper Elevation="0" Class="dynamic-crud-view__detail-empty">
+                        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="2" Class="mud-height-full">
+                            <MudIcon Icon="@Icons.Material.Filled.Description" Size="Size.Large" Class="dynamic-crud-view__detail-empty-icon" />
+                            <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="dynamic-crud-view__detail-empty-title">
+                                @EmptyDetailTitle
+                            </MudText>
+                            <MudText Typo="Typo.body2" Align="Align.Center" Class="dynamic-crud-view__detail-empty-text">
+                                @EmptyDetailText
+                            </MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
 
-    <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__form-shell responsive-surface-padding">
-        <FormActionToolbar
-            OnAdd="OnAdd"
-            OnModify="OnModify"
-            OnDelete="OnDelete"
-            OnSave="OnSave"
-            OnClose="OnClose" />
+                <MudDivider />
 
-        <MudDivider Class="my-4 my-md-5" />
-
-        @if (ChildContent is not null)
-        {
-            <div class="dynamic-crud-view__form-body">
-                @ChildContent
-            </div>
-        }
-    </MudPaper>
-</MudStack>
+                <FormActionToolbar
+                    OnSave="OnSave"
+                    OnClose="OnClose"
+                    ShowAdd="false"
+                    ShowModify="false"
+                    ShowDelete="false"
+                    ShowSave="true"
+                    ShowClose="true"
+                    UseCloseIcon="false"
+                    DisableSave="@(!IsDetailOpen)"
+                    DisableClose="@(!IsDetailOpen)"
+                    Justify="Justify.SpaceBetween" />
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 @code {
+    private readonly int[] _pageSizeOptions = [10, 25, 50, 100];
+
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
     [Parameter]
-    public string BadgeText { get; set; } = string.Empty;
+    public string DetailTitle { get; set; } = "Details";
+
+    [Parameter]
+    public string DetailSubtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string EmptyDetailTitle { get; set; } = "No item selected";
+
+    [Parameter]
+    public string EmptyDetailText { get; set; } = "Click a row in the grid or use Add to open the detail panel.";
 
     [Parameter]
     public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
 
     [Parameter]
-    public RenderFragment? HeaderContent { get; set; }
+    public RenderFragment? Columns { get; set; }
 
     [Parameter]
-    public RenderFragment<TItem>? RowTemplate { get; set; }
+    public RenderFragment? DetailContent { get; set; }
 
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment? ToolBarEndContent { get; set; }
+
+    [Parameter]
+    public TItem? SelectedItem { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem?> SelectedItemChanged { get; set; }
+
+    [Parameter]
+    public bool IsDetailOpen { get; set; }
+
+    [Parameter]
+    public int GridColumnsMd { get; set; } = 7;
+
+    [Parameter]
+    public int GridColumnsLg { get; set; } = 8;
+
+    [Parameter]
+    public int DetailColumnsMd { get; set; } = 5;
+
+    [Parameter]
+    public int DetailColumnsLg { get; set; } = 4;
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnAdd { get; set; }
@@ -86,4 +180,36 @@
     [Parameter]
     public EventCallback<MouseEventArgs> OnClose { get; set; }
 
+    [Parameter]
+    public EventCallback<DataGridRowClickEventArgs<TItem>> OnRowClick { get; set; }
+
+    private async Task HandleAdd(MouseEventArgs args)
+    {
+        await OnAdd.InvokeAsync(args);
+    }
+
+    private async Task HandleModify(MouseEventArgs args)
+    {
+        await OnModify.InvokeAsync(args);
+    }
+
+    private async Task HandleDelete(MouseEventArgs args)
+    {
+        await OnDelete.InvokeAsync(args);
+    }
+
+    private async Task HandleSelectedItemChanged(TItem? item)
+    {
+        await SelectedItemChanged.InvokeAsync(item);
+    }
+
+    private async Task HandleRowClick(DataGridRowClickEventArgs<TItem> args)
+    {
+        await SelectedItemChanged.InvokeAsync(args.Item);
+
+        if (OnRowClick.HasDelegate)
+        {
+            await OnRowClick.InvokeAsync(args);
+        }
+    }
 }

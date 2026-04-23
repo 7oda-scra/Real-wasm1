@@ -1,10 +1,26 @@
 <section class="page-container">
     <div class="page-container__content">
         <MudStack Spacing="4">
-            @if (!string.IsNullOrWhiteSpace(Title))
-            {
-                <MudText Typo="Typo.h4" Class="page-container__title">@Title</MudText>
-            }
+            <div class="page-container__header">
+                @if (_resolvedBreadcrumbs.Count > 0)
+                {
+                    <MudBreadcrumbs Items="_resolvedBreadcrumbs" Class="page-container__breadcrumbs" Separator="/">
+                        <ItemTemplate Context="item">
+                            <MudLink Href="@item.Href"
+                                     Disabled="@item.Disabled"
+                                     Typo="Typo.body2"
+                                     Class="page-container__breadcrumb-link">
+                                @item.Text
+                            </MudLink>
+                        </ItemTemplate>
+                    </MudBreadcrumbs>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <MudText Typo="Typo.h4" Class="page-container__title">@Title</MudText>
+                }
+            </div>
 
             @if (ChildContent is not null)
             {
@@ -15,9 +31,73 @@
 </section>
 
 @code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private IReadOnlyList<BreadcrumbItem> _resolvedBreadcrumbs = [];
+
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<BreadcrumbItem>? Breadcrumbs { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _resolvedBreadcrumbs = Breadcrumbs is { Count: > 0 }
+            ? Breadcrumbs
+            : BuildBreadcrumbsFromRoute();
+    }
+
+    private IReadOnlyList<BreadcrumbItem> BuildBreadcrumbsFromRoute()
+    {
+        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Trim('/');
+        var items = new List<BreadcrumbItem>
+        {
+            new("Home", "/")
+        };
+
+        if (string.IsNullOrWhiteSpace(relativePath))
+        {
+            items[0] = new BreadcrumbItem("Home", "/", true);
+            return items;
+        }
+
+        var segments = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var hrefSegments = new List<string>();
+
+        foreach (var segment in segments)
+        {
+            hrefSegments.Add(segment);
+            items.Add(new BreadcrumbItem(
+                text: ToReadableTitle(segment),
+                href: "/" + string.Join('/', hrefSegments)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(Title))
+        {
+            items.Add(new BreadcrumbItem(Title, href: null, disabled: true));
+        }
+        else
+        {
+            var last = items[^1];
+            items[^1] = new BreadcrumbItem(last.Text, last.Href, true, last.Icon);
+        }
+
+        return items;
+    }
+
+    private static string ToReadableTitle(string segment)
+    {
+        var words = segment.Replace('-', ' ')
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(word => word.Length == 1
+                ? char.ToUpperInvariant(word[0]).ToString()
+                : char.ToUpperInvariant(word[0]) + word[1..]);
+
+        return string.Join(' ', words);
+    }
 }
