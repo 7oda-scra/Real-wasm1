@@ -14,7 +14,7 @@
         <MudNavGroup Title="Modules" Expanded="true" Icon="@Icons.Material.Filled.Apps" Class="app-nav-menu__group">
             @foreach (var module in _allowedModules)
             {
-                <MudNavLink Href="@module.Route" Match="NavLinkMatch.All" Icon="@module.IconPath" Class="app-nav-menu__child-link">@module.Name</MudNavLink>
+                <MudNavLink Href="@module.Route" Match="NavLinkMatch.All" Icon="@null" Class="app-nav-menu__child-link">@module.Name</MudNavLink>
             }
         </MudNavGroup>
     }

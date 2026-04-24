@@ -1,8 +1,9 @@
+@using MudBlazor
 @typeparam TItem where TItem : class
 
-<MudGrid Spacing="3" Class="dynamic-crud-view">
-    <MudItem xs="12" md="@GridColumnsMd" lg="@GridColumnsLg">
-        <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
+<MudGrid Spacing="6" Class="dynamic-crud-view">
+    <MudItem xs="12" md="@(IsDetailPanelVisible ? 7 : 12)" lg="@(IsDetailPanelVisible ? 8 : 12)">
+        <MudPaper Elevation="1" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-4 dynamic-crud-view__heading">
                 <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
             </MudStack>
@@ -18,11 +19,14 @@
                          HorizontalScrollbar="true"
                          Breakpoint="Breakpoint.None"
                          ReadOnly="true"
+                         Outlined="false"
+                         Elevation="1"
                          SelectOnRowClick="true"
                          SelectedItem="SelectedItem"
                          SelectedItemChanged="HandleSelectedItemChanged"
                          RowClick="HandleRowClick"
-                         Class="dynamic-crud-view__grid">
+                         Class="dynamic-crud-view__grid"
+                         Style="width: 100%;">
                 <ToolBarContent>
                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar">
                         <FormActionToolbar
@@ -56,11 +60,17 @@
         </MudPaper>
     </MudItem>
 
-    <MudItem xs="12" md="@DetailColumnsMd" lg="@DetailColumnsLg">
-        <MudPaper Elevation="0" Class="rounded-xl dynamic-crud-view__detail-shell responsive-surface-padding">
-            <MudStack Spacing="3" Class="dynamic-crud-view__detail-frame">
-                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Class="dynamic-crud-view__detail-header">
-                    <MudStack Spacing="1">
+    @if (IsDetailPanelVisible)
+    {
+        <MudItem xs="12" md="5" lg="4">
+            <MudCard Elevation="2" Class="dynamic-crud-view__detail-card pa-6 rounded-lg">
+                <MudIconButton Icon="@Icons.Material.Filled.Close"
+                               Color="Color.Default"
+                               Class="dynamic-crud-view__detail-close"
+                               OnClick="OnClose" />
+
+                <MudStack Spacing="3" Class="dynamic-crud-view__detail-frame">
+                    <MudStack Spacing="1" Class="dynamic-crud-view__detail-header">
                         <MudText Typo="Typo.h6" Class="dynamic-crud-view__detail-title">@DetailTitle</MudText>
                         @if (!string.IsNullOrWhiteSpace(DetailSubtitle))
                         {
@@ -68,54 +78,33 @@
                         }
                     </MudStack>
 
-                    <MudIconButton Icon="@Icons.Material.Filled.Close"
-                                   Color="Color.Default"
-                                   Class="dynamic-crud-view__detail-close"
-                                   OnClick="OnClose" />
+                    @if (DetailContent is not null)
+                    {
+                        <div class="dynamic-crud-view__detail-body">
+                            @DetailContent
+                        </div>
+                    }
+
+                    <MudDivider />
+
+                    <FormActionToolbar
+                        OnSave="OnSave"
+                        ShowAdd="false"
+                        ShowModify="false"
+                        ShowDelete="false"
+                        ShowSave="true"
+                        ShowClose="false"
+                        DisableSave="@(!IsDetailPanelVisible)"
+                        Justify="Justify.FlexEnd" />
                 </MudStack>
-
-                @if (IsDetailOpen && DetailContent is not null)
-                {
-                    <div class="dynamic-crud-view__detail-body">
-                        @DetailContent
-                    </div>
-                }
-                else
-                {
-                    <MudPaper Elevation="0" Class="dynamic-crud-view__detail-empty">
-                        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="2" Class="mud-height-full">
-                            <MudIcon Icon="@Icons.Material.Filled.Description" Size="Size.Large" Class="dynamic-crud-view__detail-empty-icon" />
-                            <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="dynamic-crud-view__detail-empty-title">
-                                @EmptyDetailTitle
-                            </MudText>
-                            <MudText Typo="Typo.body2" Align="Align.Center" Class="dynamic-crud-view__detail-empty-text">
-                                @EmptyDetailText
-                            </MudText>
-                        </MudStack>
-                    </MudPaper>
-                }
-
-                <MudDivider />
-
-                <FormActionToolbar
-                    OnSave="OnSave"
-                    OnClose="OnClose"
-                    ShowAdd="false"
-                    ShowModify="false"
-                    ShowDelete="false"
-                    ShowSave="true"
-                    ShowClose="true"
-                    UseCloseIcon="false"
-                    DisableSave="@(!IsDetailOpen)"
-                    DisableClose="@(!IsDetailOpen)"
-                    Justify="Justify.SpaceBetween" />
-            </MudStack>
-        </MudPaper>
-    </MudItem>
+            </MudCard>
+        </MudItem>
+    }
 </MudGrid>
 
 @code {
     private readonly int[] _pageSizeOptions = [10, 25, 50, 100];
+    private bool IsDetailPanelVisible => SelectedItem is not null || IsAdding;
 
     [Parameter]
     public string Title { get; set; } = string.Empty;
@@ -154,16 +143,7 @@
     public bool IsDetailOpen { get; set; }
 
     [Parameter]
-    public int GridColumnsMd { get; set; } = 7;
-
-    [Parameter]
-    public int GridColumnsLg { get; set; } = 8;
-
-    [Parameter]
-    public int DetailColumnsMd { get; set; } = 5;
-
-    [Parameter]
-    public int DetailColumnsLg { get; set; } = 4;
+    public bool IsAdding { get; set; }
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnAdd { get; set; }

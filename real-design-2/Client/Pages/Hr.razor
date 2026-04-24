@@ -11,7 +11,7 @@
                         <MudNavGroup Title="@navSection.Title" Expanded="true" Icon="@navSection.Icon" Class="hr-nav-menu__group">
                             @foreach (var item in navSection.Items)
                             {
-                                <MudNavLink OnClick="@(() => SetActiveForm(item.Key))" Class="@GetNavLinkCss(item.Key)">
+                                <MudNavLink OnClick="@(() => SetActiveForm(item.Key))" Icon="@null" Class="@GetNavLinkCss(item.Key)">
                                     @item.Label
                                 </MudNavLink>
                             }
@@ -178,6 +178,7 @@
                              SelectedItem="@selectedItem"
                              SelectedItemChanged="@(item => onSelectedItemChanged(item))"
                              IsDetailOpen="@_isDetailPanelOpen"
+                             IsAdding="@(_isDetailPanelOpen && selectedItem is null)"
                              OnAdd="HandleAdd"
                              OnModify="HandleModify"
                              OnDelete="HandleDelete"
@@ -209,6 +210,7 @@
                              SelectedItem="_selectedEmployee"
                              SelectedItemChanged="SelectEmployee"
                              IsDetailOpen="@_isDetailPanelOpen"
+                             IsAdding="@(_isDetailPanelOpen && _selectedEmployee is null)"
                              OnAdd="HandleAdd"
                              OnModify="HandleModify"
                              OnDelete="HandleDelete"
@@ -255,6 +257,7 @@
                              SelectedItem="_selectedAttendanceSystem"
                              SelectedItemChanged="SelectAttendanceSystem"
                              IsDetailOpen="@_isDetailPanelOpen"
+                             IsAdding="@(_isDetailPanelOpen && _selectedAttendanceSystem is null)"
                              OnAdd="HandleAdd"
                              OnModify="HandleModify"
                              OnDelete="HandleDelete"
@@ -299,6 +302,7 @@
                              SelectedItem="_selectedShift"
                              SelectedItemChanged="SelectShift"
                              IsDetailOpen="@_isDetailPanelOpen"
+                             IsAdding="@(_isDetailPanelOpen && _selectedShift is null)"
                              OnAdd="HandleAdd"
                              OnModify="HandleModify"
                              OnDelete="HandleDelete"
