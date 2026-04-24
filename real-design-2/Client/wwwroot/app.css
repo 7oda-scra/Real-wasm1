@@ -218,6 +218,11 @@ a,
     top: 96px;
 }
 
+.hr-nav-shell .mud-nav-group .mud-collapse-container,
+.app-nav-menu .mud-nav-group .mud-collapse-container {
+    padding-inline-start: 0.2rem;
+}
+
 .app-nav-menu,
 .hr-nav-menu {
     display: flex;
@@ -262,8 +267,32 @@ a,
 
 .app-nav-menu__child-link,
 .hr-nav-menu__link {
-    margin-left: 0.85rem;
-    padding-left: 1.35rem;
+    margin-left: 0;
+    padding-left: 0.55rem !important;
+    padding-right: 0.5rem;
+    min-height: 2.6rem;
+}
+
+.app-nav-menu__child-link .mud-nav-link-icon,
+.hr-nav-menu__link .mud-nav-link-icon {
+    display: none;
+}
+
+.app-nav-menu__child-link .mud-nav-link-content,
+.hr-nav-menu__link .mud-nav-link-content {
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+.app-nav-menu__child-link .mud-nav-link-text,
+.hr-nav-menu__link .mud-nav-link-text {
+    margin-left: 0 !important;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.35;
+    width: 100%;
 }
 
 .app-nav-menu__link:hover,
@@ -285,6 +314,23 @@ a,
     font-weight: 700;
     letter-spacing: -0.03em;
     color: #0f172a;
+}
+
+.dynamic-crud-view__workspace {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.75rem;
+}
+
+.dynamic-crud-view__primary {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.dynamic-crud-view__secondary {
+    flex: 0 0 clamp(18.75rem, 24vw, 21rem);
+    width: clamp(18.75rem, 24vw, 21rem);
+    max-width: 100%;
 }
 
 .dynamic-crud-view__grid {
@@ -326,6 +372,8 @@ a,
     min-height: 100%;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08) !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97)) !important;
 }
 
 .dynamic-crud-view__detail-frame {
@@ -498,12 +546,18 @@ a,
         font-size: 1.2rem;
     }
 
-    .dynamic-crud-view__table {
-        border-radius: 20px;
+    .dynamic-crud-view__workspace {
+        flex-direction: column;
+        gap: 1.25rem;
     }
 
     .dynamic-crud-view__grid {
         border-radius: 20px;
+    }
+
+    .dynamic-crud-view__secondary {
+        width: 100%;
+        flex-basis: auto;
     }
 
     .dynamic-crud-view__detail-card {

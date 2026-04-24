@@ -1,8 +1,8 @@
 @using MudBlazor
 @typeparam TItem where TItem : class
 
-<MudGrid Spacing="6" Class="dynamic-crud-view">
-    <MudItem xs="12" md="@(IsDetailPanelVisible ? 7 : 12)" lg="@(IsDetailPanelVisible ? 8 : 12)">
+<div class="dynamic-crud-view__workspace">
+    <div class="dynamic-crud-view__primary">
         <MudPaper Elevation="1" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-4 dynamic-crud-view__heading">
                 <MudText Typo="Typo.h5" Class="dynamic-crud-view__title">@Title</MudText>
@@ -12,7 +12,7 @@
                          Items="Items"
                          Hover="true"
                          Striped="true"
-                         Dense="true"
+                         Dense="false"
                          Filterable="true"
                          SortMode="SortMode.Multiple"
                          ColumnResizeMode="ResizeMode.Column"
@@ -58,11 +58,11 @@
                 </PagerContent>
             </MudDataGrid>
         </MudPaper>
-    </MudItem>
+    </div>
 
     @if (IsDetailPanelVisible)
     {
-        <MudItem xs="12" md="5" lg="4">
+        <aside class="dynamic-crud-view__secondary">
             <MudCard Elevation="2" Class="dynamic-crud-view__detail-card pa-6 rounded-lg">
                 <MudIconButton Icon="@Icons.Material.Filled.Close"
                                Color="Color.Default"
@@ -98,9 +98,9 @@
                         Justify="Justify.FlexEnd" />
                 </MudStack>
             </MudCard>
-        </MudItem>
+        </aside>
     }
-</MudGrid>
+</div>
 
 @code {
     private readonly int[] _pageSizeOptions = [10, 25, 50, 100];

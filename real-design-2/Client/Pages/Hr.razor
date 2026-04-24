@@ -190,10 +190,10 @@
                 </Columns>
                 <DetailContent>
                     <MudGrid Spacing="3">
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="draft.Id" Label="@idLabel" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="draft.Name" Label="@nameLabel" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
                     </MudGrid>
@@ -223,19 +223,19 @@
                 </Columns>
                 <DetailContent>
                     <MudGrid Spacing="3">
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_employeeDraft.Id" Label="Employee ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_employeeDraft.Name" Label="Employee Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_employeeDraft.Title" Label="Job Title" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_employeeDraft.Email" Label="Email Address" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Email" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudSelect T="string" @bind-Value="_employeeDraft.Department" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true">
                                 @foreach (var department in _departments)
                                 {
@@ -274,10 +274,10 @@
                 </Columns>
                 <DetailContent>
                     <MudGrid Spacing="3">
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_attendanceSystemDraft.Id" Label="Attendance System ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_attendanceSystemDraft.Name" Label="Attendance System Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
                         <MudItem xs="12">
@@ -319,13 +319,13 @@
                 </Columns>
                 <DetailContent>
                     <MudGrid Spacing="3">
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_shiftDraft.Id" Label="Shift ID" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudTextField @bind-Value="_shiftDraft.Name" Label="Shift Name" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudSelect T="string" @bind-Value="_shiftDraft.AttendanceSystemId" Label="Attendance System" Variant="Variant.Outlined" Margin="Margin.Dense" FullWidth="true">
                                 @foreach (var attendanceSystem in _attendanceSystems)
                                 {
@@ -333,10 +333,10 @@
                                 }
                             </MudSelect>
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudNumericField T="int" @bind-Value="_shiftDraft.WorkingHours" Label="Working Hours" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Max="24" FullWidth="true" />
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudPaper Elevation="0" Class="rounded-xl hr-accent-card responsive-surface-padding">
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
                                     <MudText Typo="Typo.subtitle2" Style="font-weight: 600;">Starts At</MudText>
@@ -345,7 +345,7 @@
                                 <MudTimePicker @bind-Time="_shiftDraft.StartTime" Label="Start time" Variant="Variant.Outlined" Margin="Margin.Dense" AmPm="true" />
                             </MudPaper>
                         </MudItem>
-                        <MudItem xs="12" md="6">
+                        <MudItem xs="12">
                             <MudPaper Elevation="0" Class="rounded-xl hr-accent-card responsive-surface-padding">
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
                                     <MudText Typo="Typo.subtitle2" Style="font-weight: 600;">Ends At</MudText>
