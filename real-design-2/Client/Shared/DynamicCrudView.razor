@@ -1,4 +1,5 @@
 @using MudBlazor
+@using System.Reflection
 @typeparam TItem where TItem : class
 
 <div class="dynamic-crud-view__workspace">
@@ -21,6 +22,7 @@
                          ReadOnly="true"
                          Outlined="false"
                          Elevation="1"
+                         QuickFilter="MatchesQuickSearch"
                          SelectOnRowClick="true"
                          SelectedItem="SelectedItem"
                          SelectedItemChanged="HandleSelectedItemChanged"
@@ -39,10 +41,24 @@
                             DisableDelete="@(SelectedItem is null)"
                             Justify="Justify.FlexStart" />
 
-                        @if (ToolBarEndContent is not null)
-                        {
-                            @ToolBarEndContent
-                        }
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar-search-cluster">
+                            <MudTextField T="string"
+                                          @bind-Value="_searchText"
+                                          Placeholder="@ResolvedSearchPlaceholder"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          Clearable="true"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search"
+                                          InputType="InputType.Search"
+                                          Class="dynamic-crud-view__search" />
+
+                            @if (ToolBarEndContent is not null)
+                            {
+                                @ToolBarEndContent
+                            }
+                        </MudStack>
                     </MudStack>
                 </ToolBarContent>
 
@@ -104,7 +120,15 @@
 
 @code {
     private readonly int[] _pageSizeOptions = [10, 25, 50, 100];
-    private bool IsDetailPanelVisible => SelectedItem is not null || IsAdding;
+    private readonly Lazy<PropertyInfo[]> _searchableProperties = new(() => typeof(TItem)
+        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+        .Where(property => property.CanRead && property.GetIndexParameters().Length == 0)
+        .ToArray());
+    private bool IsDetailPanelVisible => IsDetailOpen;
+    private string _searchText = string.Empty;
+    private string ResolvedSearchPlaceholder => string.IsNullOrWhiteSpace(SearchPlaceholder)
+        ? $"Search {Title.ToLowerInvariant()}"
+        : SearchPlaceholder;
 
     [Parameter]
     public string Title { get; set; } = string.Empty;
@@ -144,6 +168,12 @@
 
     [Parameter]
     public bool IsAdding { get; set; }
+
+    [Parameter]
+    public string SearchPlaceholder { get; set; } = string.Empty;
+
+    [Parameter]
+    public Func<TItem, string?>? SearchTextSelector { get; set; }
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnAdd { get; set; }
@@ -191,5 +221,31 @@
         {
             await OnRowClick.InvokeAsync(args);
         }
+    }
+
+    private bool MatchesQuickSearch(TItem item)
+    {
+        if (string.IsNullOrWhiteSpace(_searchText))
+        {
+            return true;
+        }
+
+        var searchTerm = _searchText.Trim();
+
+        if (SearchTextSelector is not null &&
+            SearchTextSelector(item)?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return true;
+        }
+
+        foreach (var property in _searchableProperties.Value)
+        {
+            if (property.GetValue(item)?.ToString()?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

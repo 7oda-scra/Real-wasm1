@@ -220,7 +220,7 @@ a,
 
 .hr-nav-shell .mud-nav-group .mud-collapse-container,
 .app-nav-menu .mud-nav-group .mud-collapse-container {
-    padding-inline-start: 0.2rem;
+    padding-inline-start: 0;
 }
 
 .app-nav-menu,
@@ -268,12 +268,22 @@ a,
 .app-nav-menu__child-link,
 .hr-nav-menu__link {
     margin-left: 0;
-    padding-left: 0.55rem !important;
+    padding-left: 0.35rem !important;
     padding-right: 0.5rem;
     min-height: 2.6rem;
 }
 
-.app-nav-menu__child-link .mud-nav-link-icon,
+.hr-nav-menu__link,
+.hr-nav-menu .mud-nav-group > .mud-nav-link {
+    overflow: visible;
+}
+
+.app-nav-menu__child-link .mud-nav-link-icon {
+    display: inline-flex;
+    color: #64748b;
+    font-size: 1.1rem;
+}
+
 .hr-nav-menu__link .mud-nav-link-icon {
     display: none;
 }
@@ -283,16 +293,23 @@ a,
     justify-content: flex-start;
     align-items: center;
     width: 100%;
+    min-width: 0;
 }
 
 .app-nav-menu__child-link .mud-nav-link-text,
 .hr-nav-menu__link .mud-nav-link-text {
-    margin-left: 0 !important;
+    margin-left: 0.55rem !important;
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
     line-height: 1.35;
     width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.hr-nav-menu__link .mud-nav-link-text {
+    margin-left: 0 !important;
 }
 
 .app-nav-menu__link:hover,
@@ -319,7 +336,7 @@ a,
 .dynamic-crud-view__workspace {
     display: flex;
     align-items: flex-start;
-    gap: 1.75rem;
+    gap: 1.4rem;
 }
 
 .dynamic-crud-view__primary {
@@ -328,8 +345,8 @@ a,
 }
 
 .dynamic-crud-view__secondary {
-    flex: 0 0 clamp(18.75rem, 24vw, 21rem);
-    width: clamp(18.75rem, 24vw, 21rem);
+    flex: 0 0 clamp(17.25rem, 21vw, 19.5rem);
+    width: clamp(17.25rem, 21vw, 19.5rem);
     max-width: 100%;
 }
 
@@ -365,6 +382,18 @@ a,
 .dynamic-crud-view__toolbar {
     row-gap: 0.75rem;
     padding-bottom: 0.55rem;
+}
+
+.dynamic-crud-view__toolbar-search-cluster {
+    margin-left: auto;
+}
+
+.dynamic-crud-view__search {
+    min-width: min(100%, 18rem);
+}
+
+.dynamic-crud-view__search .mud-input-control {
+    margin-top: 0;
 }
 
 .dynamic-crud-view__detail-card {
@@ -560,6 +589,16 @@ a,
         flex-basis: auto;
     }
 
+    .dynamic-crud-view__toolbar-search-cluster {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .dynamic-crud-view__search {
+        width: 100%;
+        min-width: 0;
+    }
+
     .dynamic-crud-view__detail-card {
         padding: 1.25rem !important;
     }
@@ -577,7 +616,7 @@ a,
 
 @media (min-width: 960px) {
     .page-container__content {
-        padding: 1.5rem 2rem 2rem;
+        padding: 1.25rem 1.5rem 2rem;
     }
 
     .responsive-surface-padding {
