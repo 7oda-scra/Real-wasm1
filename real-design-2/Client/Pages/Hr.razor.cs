@@ -44,7 +44,7 @@ public partial class Hr : ComponentBase
             ])
     ];
 
-    private string _activeForm = HrViewKeys.Sectors;
+    private string _activeForm = HrViewKeys.Employees;
     private bool _isDetailPanelOpen;
 
     private List<Sector> _sectors = [];
@@ -111,6 +111,8 @@ public partial class Hr : ComponentBase
                 Department = "Human Resources"
             }
         ];
+        _employees.AddRange(BuildChaoticEmployees(200));
+
         _salaryItems =
         [
             new BaseDto { Id = "SAL-001", Name = "Housing Allowance" },
@@ -456,6 +458,45 @@ public partial class Hr : ComponentBase
 
         select(items[0]);
         return true;
+    }
+
+    private static IEnumerable<EmployeeRecord> BuildChaoticEmployees(int count)
+    {
+        string[] chunks =
+        [
+            "xqv", "BLORT", "zz-90", "mrrp", "NOPE", "fizzl", "k_tak", "v0id",
+            "plonk", "AAaa", "drip7", "wub", "N0N", "skrr", "q_q", "brx"
+        ];
+        string[] titles =
+        [
+            "!! flux wrangler", "quasi table hum", "NULL-ish button pusher", "zorp coordinator",
+            "banana-free analyst", "404 desk ritualist", "spreadsheet fog", "yakless pipeline"
+        ];
+        string[] domains =
+        [
+            "nope.invalid", "zzzz.local", "chaos.box", "void.test", "not-mail.example"
+        ];
+        string[] departments =
+        [
+            "Dept ??", "Ops-404", "Tiny Volcano", "Blue Static", "Accounting-ish",
+            "Unsorted Pile", "Left Drawer Stress", "Mega Random"
+        ];
+
+        for (var index = 0; index < count; index++)
+        {
+            var first = chunks[(index * 7) % chunks.Length];
+            var second = chunks[(index * 11 + 3) % chunks.Length];
+            var third = chunks[(index * 13 + 5) % chunks.Length];
+
+            yield return new EmployeeRecord
+            {
+                Id = $"EMP-X{index + 3:000}",
+                Name = $"{first}_{index % 37}-{second} {third}",
+                Title = $"{titles[index % titles.Length]} #{(index * 19) % 997}",
+                Email = $"{first}.{second}.{index:000}@{domains[index % domains.Length]}".ToLowerInvariant(),
+                Department = $"{departments[index % departments.Length]} {(index * 5) % 23}"
+            };
+        }
     }
 
     private void SaveBasicItem<T>(List<T> items, T draft, Action<T> setDraft, Action<T?> setSelected)
