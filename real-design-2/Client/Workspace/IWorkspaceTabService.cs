@@ -20,6 +20,8 @@ public interface IWorkspaceTabService
 
     bool Close(string tabId);
 
+    void Clear();
+
     void SetDirty(string tabId, bool isDirty);
 
     void UpdateTitle(string tabId, string title, string? subtitle = null);

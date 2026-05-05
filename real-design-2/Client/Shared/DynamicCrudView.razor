@@ -21,7 +21,7 @@
                          Breakpoint="Breakpoint.None"
                          ReadOnly="true"
                          Outlined="false"
-                         Elevation="1"
+                         Elevation="0"
                          QuickFilter="MatchesQuickSearch"
                          SelectOnRowClick="true"
                          SelectedItem="SelectedItem"
@@ -41,7 +41,7 @@
                             DisableDelete="@(SelectedItem is null)"
                             Justify="Justify.FlexStart" />
 
-                        <MudStack Row="true" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar-search-cluster">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar-search-cluster">
                             <MudTextField T="string"
                                           @bind-Value="_searchText"
                                           Placeholder="@ResolvedSearchPlaceholder"

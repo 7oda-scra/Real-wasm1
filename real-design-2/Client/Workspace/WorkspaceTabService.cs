@@ -103,6 +103,13 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
         return true;
     }
 
+    public void Clear()
+    {
+        _tabs.Clear();
+        _activeTabId = null;
+        NotifyChanged();
+    }
+
     public void SetDirty(string tabId, bool isDirty)
     {
         var tab = _tabs.FirstOrDefault(item => item.Id == tabId);

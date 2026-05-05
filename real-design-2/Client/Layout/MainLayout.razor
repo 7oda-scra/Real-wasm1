@@ -2,6 +2,7 @@
 @implements IDisposable
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
+@inject IWorkspaceTabService WorkspaceTabs
 
 <MudLayout Class="app-shell__layout">
     <MudBreakpointProvider OnBreakpointChanged="HandleBreakpointChanged" />
@@ -143,6 +144,7 @@
         try
         {
             await AuthService.LogoutAsync();
+            WorkspaceTabs.Clear();
             NavigationManager.NavigateTo("/login", forceLoad: false);
         }
         finally

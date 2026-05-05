@@ -186,6 +186,12 @@ public partial class Hr : ComponentBase
 
     private void HandleModify(MouseEventArgs _)
     {
+        if (_activeForm == HrViewKeys.Employees)
+        {
+            OpenSelectedEmployeeWorkspaceTab(_);
+            return;
+        }
+
         if (!TryOpenCurrentSelection())
         {
             Snackbar.Add($"Select a {GetActiveFormLabel().ToLowerInvariant()} row before modifying.", Severity.Warning);
@@ -769,7 +775,7 @@ public partial class Hr : ComponentBase
     {
         if (_selectedEmployee is null)
         {
-            Snackbar.Add("Select an employee before opening a dedicated tab.", Severity.Warning);
+            Snackbar.Add("Select an employee before modifying.", Severity.Warning);
             return;
         }
 

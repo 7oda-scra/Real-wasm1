@@ -219,17 +219,6 @@
                              OnDelete="HandleDelete"
                              OnSave="HandleSave"
                              OnClose="HandleToolbarClose">
-                <ToolBarEndContent>
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               Size="Size.Small"
-                               Class="rounded-pill px-4"
-                               StartIcon="@Icons.Material.Filled.OpenInNew"
-                               Disabled="@(_selectedEmployee is null)"
-                               OnClick="OpenSelectedEmployeeWorkspaceTab">
-                        Open Employee Tab
-                    </MudButton>
-                </ToolBarEndContent>
                 <Columns>
                     <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Name)" Title="Name" />
                     <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Title)" Title="Title" />

@@ -4,103 +4,84 @@
 @inject ISnackbar Snackbar
 
 <PageContainer Title="@EmployeeName" Breadcrumbs="@BuildBreadcrumbs()">
-    <MudGrid Spacing="4">
-        <MudItem xs="12" lg="8">
-            <MudPaper Elevation="1" Class="employee-workspace-card rounded-xl pa-6">
-                <MudStack Spacing="4">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                        <div>
-                            <MudText Typo="Typo.overline" Class="employee-workspace-card__eyebrow">@EmployeeId</MudText>
-                            <MudText Typo="Typo.h5" Class="employee-workspace-card__title">Employee Details</MudText>
-                        </div>
-                        @if (_isDirty)
+    <MudPaper Elevation="1" Class="employee-workspace-card rounded-xl pa-6">
+        <MudStack Spacing="4">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Class="employee-workspace-card__header">
+                <div>
+                    <MudText Typo="Typo.overline" Class="employee-workspace-card__eyebrow">@EmployeeId</MudText>
+                    <MudText Typo="Typo.h5" Class="employee-workspace-card__title">Employee Details</MudText>
+                </div>
+                <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Business" Class="rounded-pill">
+                    @_draft.Department
+                </MudChip>
+            </MudStack>
+
+            <MudGrid Spacing="3">
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string"
+                                  Value="_draft.Id"
+                                  ValueChanged="@(value => UpdateDraft(value, next => _draft.Id = next))"
+                                  Label="Employee ID"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string"
+                                  Value="_draft.Name"
+                                  ValueChanged="@(value => UpdateDraft(value, next => _draft.Name = next))"
+                                  Label="Employee Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string"
+                                  Value="_draft.Title"
+                                  ValueChanged="@(value => UpdateDraft(value, next => _draft.Title = next))"
+                                  Label="Job Title"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string"
+                                  Value="_draft.Email"
+                                  ValueChanged="@(value => UpdateDraft(value, next => _draft.Email = next))"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  InputType="InputType.Email"
+                                  FullWidth="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudSelect T="string"
+                               Value="_draft.Department"
+                               ValueChanged="@(value => UpdateDraft(value, next => _draft.Department = next))"
+                               Label="Department"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               FullWidth="true">
+                        @foreach (var department in _departments)
                         {
-                            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Circle" Class="rounded-pill">
-                                Unsaved draft
-                            </MudChip>
+                            <MudSelectItem T="string" Value="@department">@department</MudSelectItem>
                         }
-                    </MudStack>
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
 
-                    <MudGrid Spacing="3">
-                        <MudItem xs="12" sm="6">
-                            <MudTextField T="string"
-                                          Value="_draft.Id"
-                                          ValueChanged="@(value => UpdateDraft(value, next => _draft.Id = next))"
-                                          Label="Employee ID"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense"
-                                          FullWidth="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField T="string"
-                                          Value="_draft.Name"
-                                          ValueChanged="@(value => UpdateDraft(value, next => _draft.Name = next))"
-                                          Label="Employee Name"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense"
-                                          FullWidth="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField T="string"
-                                          Value="_draft.Title"
-                                          ValueChanged="@(value => UpdateDraft(value, next => _draft.Title = next))"
-                                          Label="Job Title"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense"
-                                          FullWidth="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField T="string"
-                                          Value="_draft.Email"
-                                          ValueChanged="@(value => UpdateDraft(value, next => _draft.Email = next))"
-                                          Label="Email"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense"
-                                          InputType="InputType.Email"
-                                          FullWidth="true" />
-                        </MudItem>
-                        <MudItem xs="12">
-                            <MudSelect T="string"
-                                       Value="_draft.Department"
-                                       ValueChanged="@(value => UpdateDraft(value, next => _draft.Department = next))"
-                                       Label="Department"
-                                       Variant="Variant.Outlined"
-                                       Margin="Margin.Dense"
-                                       FullWidth="true">
-                                @foreach (var department in _departments)
-                                {
-                                    <MudSelectItem T="string" Value="@department">@department</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                    </MudGrid>
+            <MudDivider />
 
-                    <MudDivider />
-
-                    <MudStack Row="true" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Default" Class="rounded-pill px-5" OnClick="ResetDraft">
-                            Reset Draft
-                        </MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="rounded-pill px-6" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveDraft">
-                            Save
-                        </MudButton>
-                    </MudStack>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" lg="4">
-            <MudPaper Elevation="0" Class="employee-workspace-note rounded-xl pa-5">
-                <MudStack Spacing="2">
-                    <MudIcon Icon="@Icons.Material.Filled.Tab" Class="employee-workspace-note__icon" />
-                    <MudText Typo="Typo.h6" Class="employee-workspace-note__title">Workspace persistence demo</MudText>
-                    <MudText Typo="Typo.body2" Class="employee-workspace-note__text">
-                        Edit these fields, switch to Payroll, Attendance, or HR, then return. Because this tab is kept alive, the unsaved draft remains exactly as you left it.
-                    </MudText>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+            <MudStack Row="true" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2">
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" Class="rounded-pill px-5" OnClick="ResetDraft">
+                    Discard Changes
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="rounded-pill px-6" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveDraft">
+                    Save
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
 </PageContainer>
 
 @code {
@@ -181,14 +162,14 @@
             WorkspaceTabs.UpdateTitle(WorkspaceContext.TabId, $"Employee - {_draft.Name}", _draft.Id);
         }
 
-        Snackbar.Add("Employee draft saved in the workspace.", Severity.Success);
+        Snackbar.Add("Employee changes saved.", Severity.Success);
     }
 
     private void ResetDraft()
     {
         _draft = Clone(_savedSnapshot);
         SetDirty(false);
-        Snackbar.Add("Draft reverted to the last saved values.", Severity.Info);
+        Snackbar.Add("Changes reverted.", Severity.Info);
     }
 
     private void SetDirty(bool isDirty)
