@@ -24,6 +24,7 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
     public WorkspaceTab OpenOrActivate(WorkspaceTabRequest request, bool updateRoute = true)
     {
         var existing = _tabs.FirstOrDefault(tab => tab.Id == request.Id);
+        var activeChanged = _activeTabId != request.Id;
 
         if (existing is null)
         {
@@ -40,6 +41,7 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
             };
 
             _tabs.Add(existing);
+            activeChanged = true;
         }
         else
         {
@@ -48,7 +50,12 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
 
         _activeTabId = existing.Id;
         NavigateToTabRoute(existing, updateRoute);
-        NotifyChanged();
+
+        if (activeChanged)
+        {
+            NotifyChanged();
+        }
+
         return existing;
     }
 
@@ -62,6 +69,12 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
         var tab = _tabs.FirstOrDefault(item => item.Id == tabId);
         if (tab is null)
         {
+            return;
+        }
+
+        if (_activeTabId == tab.Id)
+        {
+            NavigateToTabRoute(tab, updateRoute);
             return;
         }
 
@@ -105,6 +118,11 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
 
     public void Clear()
     {
+        if (_tabs.Count == 0 && _activeTabId is null)
+        {
+            return;
+        }
+
         _tabs.Clear();
         _activeTabId = null;
         NotifyChanged();
@@ -126,6 +144,11 @@ public sealed class WorkspaceTabService : IWorkspaceTabService
     {
         var tab = _tabs.FirstOrDefault(item => item.Id == tabId);
         if (tab is null)
+        {
+            return;
+        }
+
+        if (tab.Title == title && tab.Subtitle == subtitle)
         {
             return;
         }

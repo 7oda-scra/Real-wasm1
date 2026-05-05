@@ -2,7 +2,7 @@
 @using System.Reflection
 @typeparam TItem where TItem : class
 
-<div class="dynamic-crud-view__workspace">
+<div class="@WorkspaceClass">
     <div class="dynamic-crud-view__primary">
         <MudPaper Elevation="1" Class="rounded-xl dynamic-crud-view__table-shell responsive-surface-padding">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-4 dynamic-crud-view__heading">
@@ -30,24 +30,27 @@
                          Class="dynamic-crud-view__grid"
                          Style="width: 100%;">
                 <ToolBarContent>
-                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar">
-                        <FormActionToolbar
-                            OnAdd="HandleAdd"
-                            OnModify="HandleModify"
-                            OnDelete="HandleDelete"
-                            ShowSave="false"
-                            ShowClose="false"
-                            DisableModify="@(SelectedItem is null)"
-                            DisableDelete="@(SelectedItem is null)"
-                            Justify="Justify.FlexStart" />
+                    <div class="dynamic-crud-view__toolbar">
+                        <div class="dynamic-crud-view__toolbar-actions">
+                            <FormActionToolbar
+                                OnAdd="HandleAdd"
+                                OnModify="HandleModify"
+                                OnDelete="HandleDelete"
+                                ShowSave="false"
+                                ShowClose="false"
+                                DisableModify="@(SelectedItem is null)"
+                                DisableDelete="@(SelectedItem is null)"
+                                Justify="Justify.FlexStart" />
+                        </div>
 
-                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Wrap="Wrap.Wrap" Spacing="2" Class="dynamic-crud-view__toolbar-search-cluster">
+                        <div class="dynamic-crud-view__toolbar-search-lane">
                             <MudTextField T="string"
                                           @bind-Value="_searchText"
                                           Placeholder="@ResolvedSearchPlaceholder"
                                           Variant="Variant.Outlined"
                                           Margin="Margin.Dense"
                                           Immediate="true"
+                                          DebounceInterval="250"
                                           Clearable="true"
                                           Adornment="Adornment.Start"
                                           AdornmentIcon="@Icons.Material.Filled.Search"
@@ -58,8 +61,8 @@
                             {
                                 @ToolBarEndContent
                             }
-                        </MudStack>
-                    </MudStack>
+                        </div>
+                    </div>
                 </ToolBarContent>
 
                 <Columns>
@@ -126,6 +129,9 @@
         .ToArray());
     private bool IsDetailPanelVisible => IsDetailOpen;
     private string _searchText = string.Empty;
+    private string WorkspaceClass => IsDetailPanelVisible
+        ? "dynamic-crud-view__workspace dynamic-crud-view__workspace--detail-open"
+        : "dynamic-crud-view__workspace";
     private string ResolvedSearchPlaceholder => string.IsNullOrWhiteSpace(SearchPlaceholder)
         ? $"Search {Title.ToLowerInvariant()}"
         : SearchPlaceholder;
