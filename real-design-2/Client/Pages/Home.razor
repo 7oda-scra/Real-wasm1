@@ -2,7 +2,7 @@
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IModuleService ModuleService
-@inject NavigationManager NavigationManager
+@inject IWorkspaceTabService WorkspaceTabs
 
 <PageContainer Title="@($"{_greeting}, {_displayName}!")">
     @if (_isLoading)
@@ -36,7 +36,7 @@
                 {
                     <MudItem xs="12" sm="6" md="4" lg="3">
                         <MudCard Elevation="0" Class="bento-card rounded-xl pa-4">
-                            <div @onclick="() => NavigationManager.NavigateTo(module.Route)" style="cursor: pointer; height: 100%;" class="d-flex flex-column align-center justify-center pa-6">
+                            <div @onclick="() => OpenModule(module)" style="cursor: pointer; height: 100%;" class="d-flex flex-column align-center justify-center pa-6">
                                 <div class="icon-badge mb-4" style="@($"width: 72px; height: 72px; background-color: {module.HexColor}1A;")">
                                     <MudIcon Icon="@module.IconPath" Style="@($"color: {module.HexColor}; font-size: 2.5rem;")" />
                                 </div>
@@ -86,5 +86,10 @@
         {
             _isLoading = false;
         }
+    }
+
+    private void OpenModule(ModuleDefinitionDto module)
+    {
+        WorkspaceTabs.OpenOrActivate(WorkspaceTabCatalog.ForModule(module.Name, module.Route, module.IconPath));
     }
 }

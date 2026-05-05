@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using RealDesign2.Client.Services;
+using RealDesign2.Client.Workspace;
 using RealDesign2.Shared.Models;
 
 namespace RealDesign2.Client.Pages;
@@ -13,6 +14,9 @@ public partial class Hr : ComponentBase
 
     [Inject]
     private ISnackbar Snackbar { get; set; } = default!;
+
+    [Inject]
+    private IWorkspaceTabService WorkspaceTabs { get; set; } = default!;
 
     private readonly IReadOnlyList<HrNavigationSection> _navigationSections =
     [
@@ -759,6 +763,22 @@ public partial class Hr : ComponentBase
         _selectedEmployee = item;
         _employeeDraft = item is not null ? CloneEmployee(item) : new EmployeeRecord();
         _isDetailPanelOpen = item is not null;
+    }
+
+    private void OpenSelectedEmployeeWorkspaceTab(MouseEventArgs _)
+    {
+        if (_selectedEmployee is null)
+        {
+            Snackbar.Add("Select an employee before opening a dedicated tab.", Severity.Warning);
+            return;
+        }
+
+        WorkspaceTabs.OpenOrActivate(WorkspaceTabCatalog.EmployeeDetails(
+            _selectedEmployee.Id,
+            _selectedEmployee.Name,
+            _selectedEmployee.Title,
+            _selectedEmployee.Email,
+            _selectedEmployee.Department));
     }
 
     private void SelectAttendanceSystem(AttendanceSystem? item)

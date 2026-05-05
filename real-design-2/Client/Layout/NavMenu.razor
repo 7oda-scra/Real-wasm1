@@ -1,9 +1,15 @@
 @implements IDisposable
 @inject IModuleService ModuleService
 @inject IAuthService AuthService
+@inject IWorkspaceTabService WorkspaceTabs
 
 <MudNavMenu Class="app-nav-menu">
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home" Class="app-nav-menu__link">Home</MudNavLink>
+    <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.Home"
+                Class="@GetRootLinkClass()"
+                OnClick="OpenDashboard">
+        Home
+    </MudNavLink>
 
     @if (_isLoading)
     {
@@ -14,7 +20,12 @@
         <MudNavGroup Title="Modules" Expanded="true" Icon="@Icons.Material.Filled.Apps" Class="app-nav-menu__group">
             @foreach (var module in _allowedModules)
             {
-                <MudNavLink Href="@module.Route" Match="NavLinkMatch.All" Icon="@module.IconPath" Class="app-nav-menu__child-link">@module.Name</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All"
+                            Icon="@module.IconPath"
+                            Class="@GetModuleLinkClass(module.Route)"
+                            OnClick="@(() => OpenModule(module))">
+                    @module.Name
+                </MudNavLink>
             }
         </MudNavGroup>
     }
@@ -27,12 +38,14 @@
     protected override async Task OnInitializedAsync()
     {
         AuthService.OnAuthStateChanged += HandleAuthStateChanged;
+        WorkspaceTabs.Changed += HandleWorkspaceChanged;
         await LoadModulesAsync();
     }
 
     public void Dispose()
     {
         AuthService.OnAuthStateChanged -= HandleAuthStateChanged;
+        WorkspaceTabs.Changed -= HandleWorkspaceChanged;
     }
 
     private void HandleAuthStateChanged(UserDto? user)
@@ -67,5 +80,37 @@
         {
             _isLoading = false;
         }
+    }
+
+    private void OpenDashboard()
+    {
+        WorkspaceTabs.OpenOrActivate(WorkspaceTabCatalog.Dashboard());
+    }
+
+    private void OpenModule(ModuleDefinitionDto module)
+    {
+        WorkspaceTabs.OpenOrActivate(WorkspaceTabCatalog.ForModule(module.Name, module.Route, module.IconPath));
+    }
+
+    private string GetRootLinkClass()
+    {
+        return WorkspaceTabs.ActiveTab?.Id == "dashboard:home"
+            ? "app-nav-menu__link mud-nav-link-active"
+            : "app-nav-menu__link";
+    }
+
+    private string GetModuleLinkClass(string route)
+    {
+        var activeRoute = WorkspaceTabs.ActiveTab?.Route?.Split('?', '#')[0];
+        var normalizedRoute = route.StartsWith('/') ? route : $"/{route}";
+
+        return string.Equals(activeRoute, normalizedRoute, StringComparison.OrdinalIgnoreCase)
+            ? "app-nav-menu__child-link mud-nav-link-active"
+            : "app-nav-menu__child-link";
+    }
+
+    private void HandleWorkspaceChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
     }
 }

@@ -1,0 +1,151 @@
+@implements IDisposable
+@inject IWorkspaceTabService WorkspaceTabs
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+
+<div class="workspace-host">
+    @if (WorkspaceTabs.Tabs.Count == 0)
+    {
+        <div class="workspace-host__loading">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        </div>
+    }
+    else
+    {
+        <MudTabs ActivePanelIndex="@WorkspaceTabs.ActiveIndex"
+                 ActivePanelIndexChanged="HandleActivePanelIndexChanged"
+                 KeepPanelsAlive="true"
+                 AlwaysShowScrollButtons="true"
+                 MinimumTabWidth="160px"
+                 Elevation="0"
+                 Rounded="false"
+                 Centered="false"
+                 Class="workspace-tabs"
+                 TabHeaderClass="workspace-tabs__header"
+                 TabPanelsClass="workspace-tabs__panels"
+                 ActiveTabClass="workspace-tabs__tab--active">
+            @foreach (var tab in WorkspaceTabs.Tabs)
+            {
+                <MudTabPanel @key="tab.Id"
+                             ID="@tab.Id"
+                             Icon="@tab.Icon"
+                             BadgeDot="@tab.IsDirty"
+                             BadgeColor="Color.Warning"
+                             ToolTip="@GetTabTooltip(tab)"
+                             PanelClass="workspace-tabs__panel">
+                    <TabContent>
+                        <div class="workspace-tabs__tab-content">
+                            <MudIcon Icon="@tab.Icon" Size="Size.Small" Class="workspace-tabs__tab-icon" />
+                            <span class="workspace-tabs__tab-title">@tab.Title</span>
+                            @if (tab.IsDirty)
+                            {
+                                <span class="workspace-tabs__dirty-dot" title="Unsaved changes"></span>
+                            }
+                            @if (!tab.IsPinned)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                               Size="Size.Small"
+                                               Color="Color.Default"
+                                               Class="workspace-tabs__close"
+                                               OnClick="@((MouseEventArgs args) => RequestCloseTabAsync(args, tab))" />
+                            }
+                        </div>
+                    </TabContent>
+
+                    <ChildContent>
+                        <CascadingValue Value="@(new WorkspaceTabContext(tab.Id))" IsFixed="true">
+                            <DynamicComponent Type="@tab.ComponentType" Parameters="@tab.Parameters" />
+                        </CascadingValue>
+                    </ChildContent>
+                </MudTabPanel>
+            }
+        </MudTabs>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        WorkspaceTabs.Changed += HandleWorkspaceChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        WorkspaceTabs.OpenOrActivateRoute(GetCurrentWorkspaceRoute(), updateRoute: false);
+    }
+
+    public void Dispose()
+    {
+        WorkspaceTabs.Changed -= HandleWorkspaceChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    private void HandleActivePanelIndexChanged(int index)
+    {
+        WorkspaceTabs.ActivateIndex(index);
+    }
+
+    private async Task RequestCloseTabAsync(MouseEventArgs args, WorkspaceTab tab)
+    {
+        if (tab.IsPinned)
+        {
+            return;
+        }
+
+        if (tab.IsDirty)
+        {
+            var parameters = new DialogParameters<ConfirmCloseDirtyTabDialog>
+            {
+                { dialog => dialog.TabTitle, tab.Title }
+            };
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.ExtraSmall,
+                FullWidth = true
+            };
+            var dialog = await DialogService.ShowAsync<ConfirmCloseDirtyTabDialog>("Unsaved changes", parameters, options);
+            var result = await dialog.Result;
+
+            if (result is null || result.Canceled)
+            {
+                return;
+            }
+        }
+
+        WorkspaceTabs.Close(tab.Id);
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        var route = GetCurrentWorkspaceRoute();
+
+        if (IsExternalWorkspaceRoute(route))
+        {
+            return;
+        }
+
+        WorkspaceTabs.OpenOrActivateRoute(route, updateRoute: false);
+    }
+
+    private string GetCurrentWorkspaceRoute()
+    {
+        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+        return string.IsNullOrWhiteSpace(relativePath) ? "/" : $"/{relativePath.Trim('/')}";
+    }
+
+    private static bool IsExternalWorkspaceRoute(string route)
+    {
+        return route.StartsWith("/login", StringComparison.OrdinalIgnoreCase) ||
+               route.StartsWith("/error", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string GetTabTooltip(WorkspaceTab tab)
+    {
+        return tab.IsDirty
+            ? $"{tab.Title} has unsaved changes"
+            : tab.Subtitle ?? tab.Title;
+    }
+
+    private void HandleWorkspaceChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+}

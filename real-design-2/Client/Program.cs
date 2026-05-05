@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using RealDesign2.Client;
 using RealDesign2.Client.Interfaces;
 using RealDesign2.Client.Services;
+using RealDesign2.Client.Workspace;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -25,6 +26,7 @@ builder.Services.AddScoped<IAuthSessionStore, InMemoryAuthSessionStore>();
 builder.Services.AddScoped<IAuthService, ApiAuthService>();
 builder.Services.AddScoped<IModuleService, ApiModuleService>();
 builder.Services.AddScoped<HrMockDataService>();
+builder.Services.AddScoped<IWorkspaceTabService, WorkspaceTabService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 await builder.Build().RunAsync();

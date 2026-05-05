@@ -1,0 +1,37 @@
+<MudDialog Class="workspace-confirm-dialog">
+    <DialogContent>
+        <MudStack Spacing="3">
+            <div class="workspace-confirm-dialog__icon">
+                <MudIcon Icon="@Icons.Material.Filled.EditNote" />
+            </div>
+            <MudText Typo="Typo.h6" Class="workspace-confirm-dialog__title">Close this tab?</MudText>
+            <MudText Typo="Typo.body2" Class="workspace-confirm-dialog__text">
+                <strong>@TabTitle</strong> has unsaved changes. Closing it will discard the draft state held in this workspace tab.
+            </MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="Cancel">Keep Editing</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Warning" Class="rounded-pill px-5" OnClick="Confirm">
+            Close Anyway
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string TabTitle { get; set; } = "This tab";
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Confirm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

@@ -88,10 +88,190 @@ a,
 }
 
 .app-shell__main-content {
-    padding-top: 4.75rem;
+    padding-top: 4.15rem;
     margin-top: 0;
     margin-bottom: 1.75rem;
     transition: padding 0.24s ease, margin 0.24s ease;
+}
+
+.workspace-host {
+    min-height: calc(100vh - 4.15rem);
+    background:
+        radial-gradient(circle at top left, rgba(68, 171, 223, 0.11), transparent 28rem),
+        linear-gradient(180deg, #f8fafc 0%, #f9fafb 42%, #ffffff 100%);
+}
+
+.workspace-host__loading {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.workspace-tabs {
+    min-height: calc(100vh - 4.15rem);
+}
+
+.workspace-tabs__header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0.6rem 1rem 0.35rem;
+    background: rgba(248, 250, 252, 0.86);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.92);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.workspace-tabs .mud-tabs-toolbar {
+    min-height: 3.1rem;
+}
+
+.workspace-tabs .mud-tab {
+    min-height: 2.6rem;
+    margin-right: 0.35rem;
+    border-radius: 999px;
+    color: #64748b;
+    text-transform: none;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.workspace-tabs .mud-tab:hover {
+    background: rgba(255, 255, 255, 0.82);
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+
+.workspace-tabs__tab--active {
+    color: #0f172a !important;
+    background: #ffffff !important;
+    box-shadow:
+        0 10px 26px rgba(15, 23, 42, 0.08),
+        inset 0 0 0 1px rgba(226, 232, 240, 0.95);
+}
+
+.workspace-tabs__tab-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+    max-width: 15rem;
+}
+
+.workspace-tabs__tab-icon {
+    color: inherit;
+    opacity: 0.82;
+    flex-shrink: 0;
+}
+
+.workspace-tabs__tab-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.workspace-tabs__dirty-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: #f59e0b;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.14);
+    flex-shrink: 0;
+}
+
+.workspace-tabs__close {
+    width: 1.65rem;
+    height: 1.65rem;
+    min-width: 1.65rem;
+    padding: 0;
+    margin-left: 0.1rem;
+    opacity: 0.66;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.workspace-tabs__close:hover {
+    opacity: 1;
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+
+.workspace-tabs__panels {
+    min-height: calc(100vh - 7.25rem);
+}
+
+.workspace-tabs__panel {
+    min-height: calc(100vh - 7.25rem);
+}
+
+.workspace-empty-state {
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    background:
+        radial-gradient(circle at top, rgba(68, 171, 223, 0.1), transparent 34%),
+        #ffffff !important;
+}
+
+.workspace-empty-state__icon {
+    font-size: 3rem !important;
+    color: #44abdf;
+}
+
+.workspace-empty-state__title,
+.employee-workspace-card__title,
+.employee-workspace-note__title,
+.workspace-confirm-dialog__title {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #0f172a;
+}
+
+.workspace-empty-state__text,
+.employee-workspace-note__text,
+.workspace-confirm-dialog__text {
+    color: #64748b;
+}
+
+.workspace-confirm-dialog__icon {
+    width: 3rem;
+    height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    color: #d97706;
+    background: rgba(245, 158, 11, 0.13);
+}
+
+.employee-workspace-card,
+.employee-workspace-note {
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98)) !important;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05) !important;
+}
+
+.employee-workspace-card__eyebrow {
+    color: #44abdf;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.employee-workspace-note {
+    position: sticky;
+    top: 7.5rem;
+}
+
+.employee-workspace-note__icon {
+    color: #44abdf;
+    font-size: 2.35rem !important;
 }
 
 .page-container__content {
@@ -556,9 +736,31 @@ a,
     }
 
     .app-shell__main-content {
-        padding-top: 4.25rem;
+        padding-top: 3.8rem;
         margin-top: 0;
         margin-bottom: 1rem;
+    }
+
+    .workspace-host,
+    .workspace-tabs {
+        min-height: calc(100vh - 3.8rem);
+    }
+
+    .workspace-tabs__header {
+        padding-inline: 0.6rem;
+    }
+
+    .workspace-tabs__tab-content {
+        max-width: 11rem;
+    }
+
+    .workspace-tabs__panels,
+    .workspace-tabs__panel {
+        min-height: calc(100vh - 6.9rem);
+    }
+
+    .employee-workspace-note {
+        position: static;
     }
 
     .page-container__content {
