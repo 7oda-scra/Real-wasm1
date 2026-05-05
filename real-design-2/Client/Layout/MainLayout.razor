@@ -34,19 +34,28 @@
         </AuthorizeView>
     </MudAppBar>
 
-    <MudDrawer @bind-Open="_drawerOpen"
-               Variant="DrawerVariant.Responsive"
-               Breakpoint="Breakpoint.Md"
-               Width="220px"
-               Elevation="1"
-               ClipMode="DrawerClipMode.Always"
-               Class="app-shell__drawer">
-        <NavMenu />
-    </MudDrawer>
+    @if (_currentUser is not null)
+    {
+        <MudDrawer @bind-Open="_drawerOpen"
+                   Variant="DrawerVariant.Responsive"
+                   Breakpoint="Breakpoint.Md"
+                   Width="220px"
+                   Elevation="1"
+                   ClipMode="DrawerClipMode.Always"
+                   Class="app-shell__drawer">
+            <NavMenu />
+        </MudDrawer>
 
-    <MudMainContent Class="app-shell__main-content">
-        <WorkspaceTabsHost />
-    </MudMainContent>
+        <MudMainContent Class="app-shell__main-content">
+            <WorkspaceTabsHost />
+        </MudMainContent>
+    }
+    else
+    {
+        <MudMainContent Class="app-shell__main-content app-shell__main-content--auth-redirect">
+            <RedirectToLogin />
+        </MudMainContent>
+    }
 </MudLayout>
 
 <div id="blazor-error-ui" data-nosnippet>

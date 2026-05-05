@@ -94,6 +94,13 @@ a,
     transition: padding 0.24s ease, margin 0.24s ease;
 }
 
+.app-shell__main-content--auth-redirect {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .workspace-host {
     min-height: calc(100vh - 4.15rem);
     background:
