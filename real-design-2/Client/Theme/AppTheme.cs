@@ -8,10 +8,21 @@ public static class AppTheme
     {
         PaletteLight = new PaletteLight
         {
-            Primary = "#44abdf",
-            Background = "#F9FAFB",
+            Primary = "#2563EB",
+            Secondary = "#F43F5E",
+            Background = "#F6F8FB",
             Surface = "#FFFFFF",
-            AppbarBackground = "#44abdf"
+            AppbarBackground = "#FFFFFF",
+            AppbarText = "#0F172A",
+            TextPrimary = "#0F172A",
+            TextSecondary = "#64748B",
+            DrawerBackground = "#FFFFFF",
+            DrawerText = "#334155",
+            LinesDefault = "#E2E8F0",
+            TableLines = "#E2E8F0",
+            Error = "#EF4444",
+            Success = "#16A34A",
+            Warning = "#F59E0B"
         },
         Typography = new Typography
         {

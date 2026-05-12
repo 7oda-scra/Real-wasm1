@@ -3,7 +3,7 @@
 
 <PageContainer Title="Human Resources" Breadcrumbs="@BuildBreadcrumbs()">
     <MudGrid Spacing="4">
-        <MudItem xs="12" md="3" lg="2">
+        <MudItem xs="12" md="4" lg="3" xl="2">
             <MudPaper Elevation="0" Class="rounded-xl hr-nav-shell responsive-surface-padding">
                 <MudNavMenu Bordered="true" Color="Color.Primary" Class="mud-width-full hr-nav-menu">
                     @foreach (var navSection in _navigationSections)
@@ -21,7 +21,7 @@
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="12" md="9" lg="10">
+        <MudItem xs="12" md="8" lg="9" xl="10">
             @switch (_activeForm)
             {
                 case HrViewKeys.Sectors:
@@ -220,9 +220,21 @@
                              OnSave="HandleSave"
                              OnClose="HandleToolbarClose">
                 <Columns>
-                    <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Name)" Title="Name" />
-                    <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Title)" Title="Title" />
-                    <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Department)" Title="Department" />
+                    <TemplateColumn T="EmployeeRecord" Title="Name">
+                        <CellTemplate Context="context">
+                            <span class="dynamic-crud-view__cell-text" title="@context.Item.Name">@context.Item.Name</span>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="EmployeeRecord" Title="Title">
+                        <CellTemplate Context="context">
+                            <span class="dynamic-crud-view__cell-text" title="@context.Item.Title">@context.Item.Title</span>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="EmployeeRecord" Title="Department">
+                        <CellTemplate Context="context">
+                            <span class="dynamic-crud-view__cell-text" title="@context.Item.Department">@context.Item.Department</span>
+                        </CellTemplate>
+                    </TemplateColumn>
                 </Columns>
                 <DetailContent>
                     <MudGrid Spacing="3">
