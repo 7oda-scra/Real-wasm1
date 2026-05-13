@@ -220,21 +220,21 @@
                              OnSave="HandleSave"
                              OnClose="HandleToolbarClose">
                 <Columns>
-                    <TemplateColumn T="EmployeeRecord" Title="Name">
+                    <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Name)" Title="Name">
                         <CellTemplate Context="context">
                             <span class="dynamic-crud-view__cell-text" title="@context.Item.Name">@context.Item.Name</span>
                         </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn T="EmployeeRecord" Title="Title">
+                    </PropertyColumn>
+                    <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Title)" Title="Title">
                         <CellTemplate Context="context">
                             <span class="dynamic-crud-view__cell-text" title="@context.Item.Title">@context.Item.Title</span>
                         </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn T="EmployeeRecord" Title="Department">
+                    </PropertyColumn>
+                    <PropertyColumn T="EmployeeRecord" TProperty="string" Property="@(employee => employee.Department)" Title="Department">
                         <CellTemplate Context="context">
                             <span class="dynamic-crud-view__cell-text" title="@context.Item.Department">@context.Item.Department</span>
                         </CellTemplate>
-                    </TemplateColumn>
+                    </PropertyColumn>
                 </Columns>
                 <DetailContent>
                     <MudGrid Spacing="3">
